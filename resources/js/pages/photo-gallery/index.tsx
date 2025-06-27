@@ -1,0 +1,60 @@
+import { TablePaginate } from '@/components/table-paginate';
+import { Separator } from '@/components/ui/separator';
+import { ApaeLayout } from '@/layouts/apae-layout';
+import { cn } from '@/lib/utils';
+import { ApiResponse, PhotoGalleryInterface, type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
+import { FormCreate } from './components/form-create';
+import { FormUpdate } from './components/form-update';
+import { GalleryDelete } from './components/gallery-delete';
+
+const breadcrumbs: BreadcrumbItem[] = [];
+
+interface PageProps {
+    data: ApiResponse<PhotoGalleryInterface[]>;
+}
+
+export default function Index({ data }: PageProps) {
+    return (
+        <ApaeLayout title="Galeria de Fotos" breadcrumbs={breadcrumbs}>
+            <Head title="Galeria de Fotos" />
+
+            <div className="flex items-center justify-between">
+                <div />
+                <FormCreate />
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="flex flex-col gap-4">
+                {data.data.map(function (gll) {
+                    return (
+                        <div key={gll.id} className="flex h-48 items-center rounded-lg border bg-white dark:bg-secondary">
+                            <div className={cn('h-48 w-52 rounded-xl border')}>
+                                <img src={route('admin.photo-gallery.image', [gll.gallery_image])} className="h-full w-full" />
+                            </div>
+                            <div className="flex h-full w-full flex-col gap-2 p-8">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2>{gll.gallery_name}</h2>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <FormUpdate gallery={gll} />
+                                        <GalleryDelete galleryId={gll.id} />
+                                    </div>
+                                </div>
+                                <p className="line-clamp-3 w-full text-sm">{gll.gallery_description}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <Separator className="my-4" />
+
+            <div>
+                <TablePaginate paginate={data} />
+            </div>
+        </ApaeLayout>
+    );
+}
