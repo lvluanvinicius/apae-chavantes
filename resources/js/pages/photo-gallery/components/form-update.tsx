@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { type PhotoGalleryInterface } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, LoaderCircle } from 'lucide-react';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { PreviewImage } from './preview-photo';
 
 interface FormUpdateProps {
@@ -25,36 +25,35 @@ export function FormUpdate({ gallery }: FormUpdateProps) {
     });
 
     function changeFile(event: ChangeEvent<HTMLInputElement>) {
-        if (event.currentTarget.files && event.currentTarget.files.length <= 0) {
-            return;
-        }
-
         const files = event.currentTarget.files;
+        if (!files || files.length === 0) return;
 
-        if (files instanceof FileList) {
-            const file = files[0];
+        const file = files[0];
 
-            if (!file.type.includes('png') && !file.type.includes('jpeg') && !file.type.includes('jpg') && !file.type.includes('webp')) {
-                return null;
-            }
+        const isImage = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type);
+        if (!isImage) return;
 
-            setData('cover', file);
-        }
+        setData('cover', file);
     }
 
     function update(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        post(route('admin.photo-gallery.update', [gallery.id]), {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        post(route('admin.photo-gallery-update', [gallery.id]), {
             onSuccess() {
                 reset();
                 setOpen(false);
             },
         });
     }
+
+    useEffect(() => {
+        setData({
+            gallery_name: gallery.gallery_name,
+            gallery_description: gallery.gallery_description,
+            cover: gallery.gallery_image,
+        });
+    }, [gallery, setData]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

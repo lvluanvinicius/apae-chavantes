@@ -20,7 +20,7 @@ export function FormCreate() {
     });
 
     function changeFile(event: ChangeEvent<HTMLInputElement>) {
-        if (event.currentTarget.files && event.currentTarget.files.length <= 0) {
+        if (!event.currentTarget.files || event.currentTarget.files.length === 0) {
             return;
         }
 

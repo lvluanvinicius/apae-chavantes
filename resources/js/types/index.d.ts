@@ -22,6 +22,18 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface NavSidebarItem {
+    title: string;
+    href: string;
+    icon: LucideIcon;
+    isActive: boolean;
+}
+
+export interface ImageLinkSrc {
+    src: string;
+    alt: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
@@ -92,6 +104,18 @@ export interface PermissionSectionInterface {
     permissions?: PermissionInterface[];
 }
 
+export interface GalleryFileInterface {
+    id: number;
+    uuid: string;
+    photo_gallery_id: number;
+    filename: string;
+    hash: string;
+    type_file: string;
+    size_file: string;
+    created_at: null | string;
+    updated_at: null | string;
+}
+
 export interface PhotoGalleryInterface {
     id: number;
     uuid: string;
@@ -103,4 +127,5 @@ export interface PhotoGalleryInterface {
     gallery_format: string;
     created_at: string | null;
     updated_at: string | null;
+    files?: GalleryFileInterface[];
 }

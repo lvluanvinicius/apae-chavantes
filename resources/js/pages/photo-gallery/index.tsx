@@ -1,9 +1,11 @@
 import { TablePaginate } from '@/components/table-paginate';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ApaeLayout } from '@/layouts/apae-layout';
 import { cn } from '@/lib/utils';
 import { ApiResponse, PhotoGalleryInterface, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { BookOpen } from 'lucide-react';
 import { FormCreate } from './components/form-create';
 import { FormUpdate } from './components/form-update';
 import { GalleryDelete } from './components/gallery-delete';
@@ -39,6 +41,11 @@ export default function Index({ data }: PageProps) {
                                         <h2>{gll.gallery_name}</h2>
                                     </div>
                                     <div className="flex items-center gap-2">
+                                        <Link href={route('admin.photo-gallery.show', [gll.uuid])}>
+                                            <Button className="bg-blue-400 hover:bg-blue-500">
+                                                <BookOpen />
+                                            </Button>
+                                        </Link>
                                         <FormUpdate gallery={gll} />
                                         <GalleryDelete galleryId={gll.id} />
                                     </div>

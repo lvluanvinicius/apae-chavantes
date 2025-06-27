@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { NavSidebarItem } from '@/types';
+import { Link } from '@inertiajs/react';
 import { Camera, Eye, FileText, Globe, Heart, Home, Image, Newspaper, Users, X } from 'lucide-react';
 import { useTheme } from './theme-provider';
 
@@ -8,15 +10,15 @@ interface SidebarProps {
     toggleSidebar: () => void;
 }
 
-const menuItems = [
-    { icon: Home, label: 'Painel', active: true },
-    { icon: Globe, label: 'Website', active: false },
-    { icon: Camera, label: 'Galeria de Fotos', active: false },
-    { icon: Eye, label: 'Transparência', active: false },
-    { icon: Users, label: 'Parceiros', active: false },
-    { icon: Newspaper, label: 'Notícias', active: false },
-    { icon: Image, label: 'Sliders', active: false },
-    { icon: FileText, label: 'Estatuto', active: false },
+const menuItems: NavSidebarItem[] = [
+    { href: '/photo-gallery', icon: Home, title: 'Painel', isActive: true },
+    { href: '/photo-gallery', icon: Globe, title: 'Website', isActive: false },
+    { href: '/photo-gallery', icon: Camera, title: 'Galeria de Fotos', isActive: false },
+    { href: '/photo-gallery', icon: Eye, title: 'Transparência', isActive: false },
+    { href: '/photo-gallery', icon: Users, title: 'Parceiros', isActive: false },
+    { href: '/photo-gallery', icon: Newspaper, title: 'Notícias', isActive: false },
+    { href: '/photo-gallery', icon: Image, title: 'Sliders', isActive: false },
+    { href: '/photo-gallery', icon: FileText, title: 'Estatuto', isActive: false },
 ];
 
 export default function ApaeSidebar({ isOpen, toggleSidebar }: SidebarProps) {
@@ -65,18 +67,19 @@ export default function ApaeSidebar({ isOpen, toggleSidebar }: SidebarProps) {
                         {menuItems.map((item, index) => {
                             const Icon = item.icon;
                             return (
-                                <Button
-                                    key={index}
-                                    className={cn(
-                                        'h-12 w-full cursor-pointer justify-start space-x-3 bg-transparent',
-                                        item.active
-                                            ? 'bg-primary-foreground/20 text-primary-foreground shadow-sm hover:bg-primary-foreground/10'
-                                            : 'text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground',
-                                    )}
-                                >
-                                    <Icon size={20} />
-                                    <span className="font-medium">{item.label}</span>
-                                </Button>
+                                <Link key={index} href={item.href}>
+                                    <Button
+                                        className={cn(
+                                            'h-12 w-full cursor-pointer justify-start space-x-3 bg-transparent',
+                                            item.isActive
+                                                ? 'bg-primary-foreground/20 text-primary-foreground shadow-sm hover:bg-primary-foreground/10'
+                                                : 'text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground',
+                                        )}
+                                    >
+                                        <Icon size={20} />
+                                        <span className="font-medium">{item.title}</span>
+                                    </Button>
+                                </Link>
                             );
                         })}
                     </nav>

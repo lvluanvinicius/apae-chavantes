@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { type User } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, LoaderCircle } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 interface UserCreateProps {
     user: User;
@@ -37,6 +37,17 @@ export function UserUpdate({ user }: UserCreateProps) {
 
         return false;
     }
+
+    useEffect(
+        function () {
+            setData({
+                email: user.email,
+                name: user.name,
+                password: '',
+            });
+        },
+        [setData, user],
+    );
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

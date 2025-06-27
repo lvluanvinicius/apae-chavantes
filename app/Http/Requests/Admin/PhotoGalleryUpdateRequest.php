@@ -21,9 +21,8 @@ class PhotoGalleryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gallery_name'        => 'required',
-            'gallery_description' => 'required|max:255',
-            'cover'               => 'file',
+            'gallery_name'        => ['required', 'string', 'max:255'],
+            'gallery_description' => ['required', 'string', 'max:255'],
         ];
     }
 

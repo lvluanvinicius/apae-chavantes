@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PhotoGalleryCreateRequest;
+use App\Http\Requests\Admin\PhotoGalleryUpdateRequest;
 use App\Models\PhotoGallery;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
@@ -121,20 +122,36 @@ class PhotoGalleryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $uuid): RedirectResponse | InertiaResponse
     {
-        //
+        try {
+            // Recuperando Album.
+            $gallery = $this->modelPhotoGallery->where('uuid', $uuid)->first();
+
+            // Validando se encontrou o album para receber as imagens.
+            if (! $gallery) {
+                throw new \Exception('Não encontrado album para atualização.');
+            }
+
+            $gallery->load('files');
+
+            return inertia('photo-gallery/show', ['data' => $gallery]);
+        } catch (\Exception $error) {
+            return redirect()->back()->with([
+                'error' => $error->getMessage(),
+            ]);
+        }
     }
 
     /**
      * Atualiza um registro.
      * @author Luan Santos <lvluansantos@gmail.com>
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\Admin\PhotoGalleryUpdateRequest $request
      * @param string $id
      * @throws \Exception
      * @return RedirectResponse
      */
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(PhotoGalleryUpdateRequest $request, string $id): RedirectResponse
     {
         try {
             // Recuperando Album.
@@ -205,8 +222,8 @@ class PhotoGalleryController extends Controller
                 DB::transaction(function () use ($data, $image, $gallery, $beforeNameFile) {
                     // Remover imagem anterior.
                     $disk = Storage::disk('public');
-                    if ($disk->exists('gallery/' . $beforeNameFile)) {
-                        $disk->delete(['gallery/' . $beforeNameFile]);
+                    if ($disk->exists($beforeNameFile)) {
+                        $disk->delete($beforeNameFile);
                     }
 
                     // Salvando imagem.
@@ -215,15 +232,22 @@ class PhotoGalleryController extends Controller
                     $gallery->update($data);
                 });
 
-                return redirect()->route('admin.photo-gallery.index')->with([
+                // return redirect()->route('admin.photo-gallery.index')
+
+                return redirect()->back()->with([
                     'success' => 'Album atualizado com sucesso.',
                 ]);
             }
+
             // Atualizando album.
             ! $gallery->update(['gallery_name' => $album['gallery_name'], 'gallery_description' => $album['gallery_description']])
             && throw new \Exception('Houve um erro ao tentar atualizar esse album.');
 
-            return redirect()->route('admin.photo-gallery.index')->with([
+            // return redirect()->route('admin.photo-gallery.index')->with([
+            //     'success' => 'Album atualizado com sucesso.',
+            // ]);
+
+            return redirect()->back()->with([
                 'success' => 'Album atualizado com sucesso.',
             ]);
         } catch (\Exception $error) {
@@ -261,7 +285,7 @@ class PhotoGalleryController extends Controller
 
                 // Remover imagem anterior.
                 $disk = Storage::disk('public');
-                $disk->delete('gallery/' . $fileName);
+                $disk->delete($fileName);
 
             });
 
