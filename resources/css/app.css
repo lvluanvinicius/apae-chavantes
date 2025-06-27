@@ -155,4 +155,17 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* opcional, se precisar intervir diretamente */
+    .filepond--item {
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .filepond--file {
+        object-fit: cover;
+    }
+    .filepond--root {
+        max-height: 350px !important;
+        overflow-y: auto !important;
+    }
 }

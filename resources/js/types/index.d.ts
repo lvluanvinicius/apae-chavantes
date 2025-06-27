@@ -108,7 +108,10 @@ export interface GalleryFileInterface {
     id: number;
     uuid: string;
     photo_gallery_id: number;
+    width: number;
+    height: number;
     filename: string;
+    path: string;
     hash: string;
     type_file: string;
     size_file: string;

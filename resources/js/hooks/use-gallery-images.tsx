@@ -15,14 +15,14 @@ interface UseGalleryImagesProps {
 export function useGalleryImages({ data }: UseGalleryImagesProps): Photo[] {
     const links = data.map((d) => {
         return {
-            src: imageLink(d.filename),
+            src: imageLink(d.path),
             alt: d.hash,
-            width: 1280,
-            height: 720,
+            width: d.width,
+            height: d.height,
             srcSet: breakpoints.map((breakpoint) => ({
-                src: imageLink(d.filename),
+                src: imageLink(d.path),
                 width: breakpoint,
-                height: Math.round((parseInt(d.size_file) / 100) * breakpoint),
+                height: Math.round((d.width / d.height) * breakpoint),
             })),
         } as Photo;
     });

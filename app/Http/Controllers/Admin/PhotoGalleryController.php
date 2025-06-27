@@ -135,7 +135,7 @@ class PhotoGalleryController extends Controller
 
             $gallery->load('files');
 
-            return inertia('photo-gallery/show', ['data' => $gallery]);
+            return inertia('photo-gallery/show', ['data' => $gallery, 'csrf_token' => csrf_token()]);
         } catch (\Exception $error) {
             return redirect()->back()->with([
                 'error' => $error->getMessage(),

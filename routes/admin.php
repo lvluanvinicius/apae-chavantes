@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
+use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,4 +15,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::get('storage/{image}', fn() => '')->name('photo-gallery.image');
     Route::post('photo-gallery-update/{photo_gallery}', [PhotoGalleryController::class, 'update'])->name('photo-gallery-update');
     Route::resource('photo-gallery', PhotoGalleryController::class);
+
+    # Rota de upload de imagens para galeria.
+    Route::post('photo-gallery/uploads/{photo_gallery}', PhotoGalleryFileUploadController::class)->name('photo-gallery.uploads');
 });
