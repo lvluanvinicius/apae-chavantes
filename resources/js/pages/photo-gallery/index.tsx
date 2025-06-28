@@ -10,7 +10,16 @@ import { FormCreate } from './components/form-create';
 import { FormUpdate } from './components/form-update';
 import { GalleryDelete } from './components/gallery-delete';
 
-const breadcrumbs: BreadcrumbItem[] = [];
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        href: '/dashboard',
+        title: 'Painel de Controle',
+    },
+    {
+        href: '/photo-gallery',
+        title: 'Galeria de Fotos',
+    },
+];
 
 interface PageProps {
     data: ApiResponse<PhotoGalleryInterface[]>;
@@ -31,9 +40,12 @@ export default function Index({ data }: PageProps) {
             <div className="flex flex-col gap-4">
                 {data.data.map(function (gll) {
                     return (
-                        <div key={gll.id} className="flex h-48 items-center rounded-lg border bg-white dark:bg-secondary">
-                            <div className={cn('h-48 w-52 rounded-xl border')}>
-                                <img src={route('admin.photo-gallery.image', [gll.gallery_image])} className="h-full w-full" />
+                        <div
+                            key={gll.id}
+                            className="flex h-52 items-center rounded-lg border bg-white p-2 shadow-md shadow-black/20 dark:bg-secondary"
+                        >
+                            <div className={cn('flex h-48 w-52 items-center justify-center rounded-xl border border-white/5')}>
+                                <img src={route('admin.photo-gallery.image', [gll.gallery_image])} className="w-full" />
                             </div>
                             <div className="flex h-full w-full flex-col gap-2 p-8">
                                 <div className="flex items-center justify-between">

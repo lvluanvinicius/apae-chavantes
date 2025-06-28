@@ -4,7 +4,7 @@ export function PreviewImage({ photo }: { photo: File | null | string }) {
     }
 
     if (photo) {
-        return <img className="w-full rounded-xl" src={route('admin.photo-gallery.image', [photo])} />;
+        return <img className="rounded-xl" src={route('admin.photo-gallery.image', [photo])} />;
     }
 
     return;

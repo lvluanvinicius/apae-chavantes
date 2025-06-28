@@ -1,67 +1,71 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-
 import { Button } from '@/components/ui/button';
-import { useForm } from '@inertiajs/react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { router } from '@inertiajs/react';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface GalleryUploadsProps {
     galleryId: number;
 }
+
 export function GalleryUploads({ galleryId }: GalleryUploadsProps) {
-    const [processing, setProcessing] = useState<boolean>(false);
-    const [open, setOpen] = useState<boolean>(false);
+    const [processing, setProcessing] = useState(false);
+    const [open, setOpen] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
-    const { post, setData } = useForm({
-        files: [] as File[],
-    });
+    const [progress, setProgress] = useState<number[]>([]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         setFiles(acceptedFiles);
         setPreviews(acceptedFiles.map((file) => URL.createObjectURL(file)));
+        setProgress(acceptedFiles.map(() => 0));
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         multiple: true,
-        accept: {
-            'image/*': [],
-        },
+        accept: { 'image/*': [] },
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setProcessing(true);
 
-        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            const formData = new FormData();
+            formData.append('files', files[i]);
 
-        files.forEach((file, i) => {
-            formData.append(`files[${i}]`, file);
-        });
+            try {
+                await axios.post(route('admin.photo-gallery.uploads', [galleryId]), formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    onUploadProgress: (event) => {
+                        const percent = Math.round((event.loaded * 100) / (event.total || 1));
+                        setProgress((prev) => {
+                            const updated = [...prev];
+                            updated[i] = percent;
+                            return updated;
+                        });
+                    },
+                });
+            } catch (err) {
+                console.error(`Erro ao enviar ${files[i].name}`, err);
+            }
+        }
 
-        setData('files', files);
-
-        post(route('admin.photo-gallery.uploads', [galleryId]), {
-            forceFormData: true,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            onSuccess: () => {
-                setFiles([]);
-                setPreviews([]);
-                setOpen(false);
-            },
-            onFinish() {
-                setProcessing(false);
-            },
+        setFiles([]);
+        setPreviews([]);
+        setOpen(false);
+        setProcessing(false);
+        router.reload({
+            only: ['data'],
         });
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="default">Upload de Imagens</Button>
+                <Button variant="default">Enviar Imagens</Button>
             </DialogTrigger>
 
             <DialogContent className="max-w-3xl">
@@ -85,6 +89,11 @@ export function GalleryUploads({ galleryId }: GalleryUploadsProps) {
                             {previews.map((src, i) => (
                                 <div key={i} className="relative">
                                     <img src={src} alt={`preview-${i}`} className="h-32 w-full rounded object-cover shadow" />
+                                    {processing && (
+                                        <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-medium text-white">
+                                            {progress[i] || 0}%
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -99,6 +108,7 @@ export function GalleryUploads({ galleryId }: GalleryUploadsProps) {
                                 setPreviews([]);
                                 setOpen(false);
                             }}
+                            disabled={processing}
                         >
                             Cancelar
                         </Button>

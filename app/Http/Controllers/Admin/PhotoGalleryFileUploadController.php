@@ -22,9 +22,8 @@ class PhotoGalleryFileUploadController extends Controller
      */
     public function __invoke(Request $request, PhotoGallery $photoGallery): JsonResponse
     {
-        dd($request->all());
         $request->validate([
-            'files' => 'required|file|image|max:5120',
+            'files' => 'required|file|image|max:15120',
         ]);
         $file        = $request->file('files');
         $currentDate = now()->format('Ymd');
