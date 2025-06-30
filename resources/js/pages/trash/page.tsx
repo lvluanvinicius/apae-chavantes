@@ -62,7 +62,7 @@ function Filters({ dstType, setDstType }: { dstType: TrashDstType; setDstType: (
 
     return (
         <>
-            <form onSubmit={handleFilter} className="flex flex-col gap-4 rounded-md border p-4 shadow-md shadow-black/20 dark:bg-secondary">
+            <form onSubmit={handleFilter} className="flex flex-col gap-4 rounded-md border p-4 shadow-md shadow-black/20 md:p-8 dark:bg-secondary">
                 <h3 className="text-muted-foreground">Filtros</h3>
 
                 <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">

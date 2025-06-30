@@ -51,7 +51,7 @@ function MenuOptions({
                     <Button
                         className={cn(
                             'w-full cursor-pointer !bg-transparent text-black hover:!bg-none dark:text-white',
-                            selectedImages.includes(imageId) && '!bg-cyan-100',
+                            selectedImages.includes(imageId) && '!bg-cyan-100 dark:!bg-cyan-100/20',
                         )}
                         onClick={handleSelect}
                     >
