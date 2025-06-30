@@ -25,7 +25,7 @@ export default function Index({ data }: PageProps) {
     return (
         <ApaeLayout breadcrumbs={breadcrumbs} title="Usuários">
             <Head title="Usuários" />
-            <div className="bgs-white rounded-lg px-8 py-6 dark:bg-secondary">
+            <div className="rounded-lg bg-white px-8 py-6 dark:bg-secondary">
                 <div className="flex items-center justify-between gap-4">
                     <div />
                     <UserCreate />

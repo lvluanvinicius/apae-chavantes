@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
@@ -24,4 +25,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Rota de upload de imagens para galeria.
     Route::post('photo-gallery/uploads/{photo_gallery}', PhotoGalleryFileUploadController::class)->name('photo-gallery.uploads');
+
+    # Trash
+    Route::resource('trash', DataTrashController::class);
 });

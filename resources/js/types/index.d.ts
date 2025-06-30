@@ -132,3 +132,24 @@ export interface PhotoGalleryInterface {
     updated_at: string | null;
     files?: GalleryFileInterface[];
 }
+
+export type TrashDstType =
+    | 'gallery'
+    | 'gallery-images'
+    | 'transparency'
+    | 'transparency-years'
+    | 'transparency-folders'
+    | 'partners'
+    | 'news'
+    | 'news_comments'
+    | 'contacts'
+    | 'complaints';
+
+export interface DataTrashInterface {
+    id: number;
+    dst_type: TrashDstType;
+    content: string;
+    deletion_date: Date;
+    created_at: string | null;
+    updated_at: string | null;
+}

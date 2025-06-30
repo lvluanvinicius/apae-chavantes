@@ -109,7 +109,7 @@ export default function Index({ data }: PageProps) {
                             </div>
 
                             <div className={cn('flex h-48 w-52 items-center justify-center rounded-xl border border-white/5')}>
-                                <img src={route('admin.photo-gallery.image', [gll.gallery_image])} className="w-full" />
+                                <img src={route('admin.photo-gallery.image', [gll.gallery_image])} className="h-full w-full rounded-xl" />
                             </div>
                             <div className="flex h-full w-full flex-col gap-2 p-8">
                                 <div className="flex items-center justify-between">
