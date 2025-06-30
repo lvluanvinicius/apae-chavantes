@@ -167,7 +167,7 @@ export function GalleryShow({ files, gallery }: { files: GalleryFileInterface[];
                                     src={route('admin.photo-gallery.image', image.path)}
                                     height={image.height}
                                     width={image.width}
-                                    className="w-full rounded rounded-md shadow"
+                                    className="w-full rounded-md shadow"
                                 />
                             </div>
                         );

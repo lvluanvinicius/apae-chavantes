@@ -25,7 +25,7 @@ export function MoveImagesTrash({
 
     async function handleDelete() {
         router.post(
-            route('admin.photo-gallery-trash', [gallery]),
+            route('admin.gallery-image-trash', [gallery]),
             { images },
             {
                 onStart: () => setProcessing(true),
@@ -52,7 +52,9 @@ export function MoveImagesTrash({
                     Você está apenas movendo essas imagens para a lixeira, portanto ainda estarão pendentes e serão excluídas dentro de 30 dias.
                 </AlertDialogDescription>
                 <AlertDialogFooter>
-                    <Button variant={'outline'} onClick={() => setOpen(false)}></Button>
+                    <Button variant={'outline'} onClick={() => setOpen(false)}>
+                        Cancelar
+                    </Button>
                     <Button onClick={handleDelete}>
                         {processing ? (
                             <>

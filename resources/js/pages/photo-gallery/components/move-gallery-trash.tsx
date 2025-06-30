@@ -13,28 +13,38 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
-export function GalleryDelete({ galleryId }: { galleryId: number }) {
+export function MoveGalleryTrash({ galleries, isUnit = true }: { galleries: number[]; isUnit?: boolean }) {
     const [open, setOpen] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
 
     function handleDelete() {
         setProcessing(true);
-        router.delete(route('admin.photo-gallery.destroy', [galleryId]), {
-            onSuccess() {
-                setProcessing(false);
-                setOpen(false);
+        router.post(
+            route('admin.photo-gallery-trash'),
+            { galleries: galleries },
+            {
+                onSuccess() {
+                    setProcessing(false);
+                    setOpen(false);
+                },
+                onFinish() {
+                    setProcessing(false);
+                },
             },
-            onFinish() {
-                setProcessing(false);
-            },
-        });
+        );
     }
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant={'destructive'} size={'icon'}>
-                    <Trash2 />
+                <Button variant={'destructive'} size={isUnit ? 'icon' : 'sm'}>
+                    {isUnit ? (
+                        <Trash2 />
+                    ) : (
+                        <>
+                            <Trash2 /> Mover para lixeira
+                        </>
+                    )}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

@@ -8,8 +8,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class GaleryImageTrashController extends Controller
+class TrashGaleryFileController extends Controller
 {
+    /**
+     * Move os dados para lixeira.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $uuid
+     * @throws \Exception
+     * @return RedirectResponse
+     */
     public function __invoke(Request $request, string $uuid): RedirectResponse
     {
         try {
