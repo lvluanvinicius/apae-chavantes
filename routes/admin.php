@@ -14,6 +14,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
     # Galeria de Fotos.
     Route::get('storage/{image}', fn() => '')->name('photo-gallery.image');
     Route::post('photo-gallery-update/{photo_gallery}', [PhotoGalleryController::class, 'update'])->name('photo-gallery-update');
+    Route::post('photo-gallery-trash/{photo_gallery}', [PhotoGalleryController::class, 'trash'])->name('photo-gallery-trash');
     Route::resource('photo-gallery', PhotoGalleryController::class);
 
     # Rota de upload de imagens para galeria.

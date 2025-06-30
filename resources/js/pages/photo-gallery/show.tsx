@@ -50,7 +50,7 @@ export default function Index({ data }: PageProps) {
                 </div>
 
                 {data.files ? (
-                    <GalleryShow files={data.files} />
+                    <GalleryShow files={data.files} gallery={data.uuid} />
                 ) : (
                     <div className="flex h-52 items-center justify-center rounded-2xl border text-lg text-muted-foreground/50">
                         Nenhuma imagem foi carregada.
