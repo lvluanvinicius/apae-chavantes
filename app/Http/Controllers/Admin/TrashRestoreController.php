@@ -7,6 +7,7 @@ use App\Models\PhotoGallery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class TrashRestoreController extends Controller
 {
@@ -42,8 +43,15 @@ class TrashRestoreController extends Controller
                             case 'gallery':
                                 $content = json_decode($trash->content, true);
                                 $gallery = new PhotoGallery($content);
+                                if (PhotoGallery::where('gallery_name', $gallery->gallery_name)->where('id', '!=', $gallery->id)->first()) {
+                                    # Aplica uma hash nos itens restaurados para evitar erro de duplicidade se houver uma galeria com o nome de onde está sendo restaurado.
+                                    $gallery->gallery_name = $gallery->gallery_name . ' ' . Str::random(5);
+                                }
                                 $gallery->save();
                                 $trash->delete();
+
+                            case 'gallery-images':
+                            #
 
                             default:
                                 # code...
