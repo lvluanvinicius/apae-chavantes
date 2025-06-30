@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
 use App\Http\Controllers\Admin\TrashGaleryFileController;
 use App\Http\Controllers\Admin\TrashPhotoGalleryController;
+use App\Http\Controllers\Admin\TrashRestoreController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,6 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::post('photo-gallery/uploads/{photo_gallery}', PhotoGalleryFileUploadController::class)->name('photo-gallery.uploads');
 
     # Trash
+    Route::post('trash-restore', TrashRestoreController::class)->name('trash-restore');
     Route::resource('trash', DataTrashController::class);
 });

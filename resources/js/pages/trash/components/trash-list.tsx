@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type DataTrashInterface, type TrashDstType } from '@/types';
-import { SquareDashedMousePointer, Trash2 } from 'lucide-react';
+import { SquareDashedMousePointer } from 'lucide-react';
 import { MouseEvent, useEffect, useState } from 'react';
 import { GalleryList } from './gallery-list';
+import { TrashRestore } from './trash-restore';
 
 export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstType: TrashDstType }) {
     const [trashSelected, setTrashSelected] = useState<number[]>([]);
@@ -43,9 +44,21 @@ export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstTy
 
     return (
         <>
-            {dstType === 'gallery' && (
-                <GalleryList handleRightClick={handleRightClick} data={data} trashSelected={trashSelected} setTrashSelected={handleSelectTrash} />
-            )}
+            <div className="flex flex-col gap-4 rounded-md bg-secondary p-4">
+                <div className="w-full">
+                    <TrashRestore
+                        onClear={() => setTrashSelected([])}
+                        trash={trashSelected}
+                        isUnit={false}
+                        className="cursor-pointer border bg-transparent text-black hover:!bg-primary dark:text-white"
+                    />
+                </div>
+
+                {dstType === 'gallery' && (
+                    <GalleryList handleRightClick={handleRightClick} data={data} trashSelected={trashSelected} setTrashSelected={handleSelectTrash} />
+                )}
+            </div>
+
             {/* <div className="rounded-md bg-secondary p-4 text-center text-muted-foreground">Nenhum tipo válido foi selecionado.</div> */}
 
             {menuPosition && selectedTrash !== null && (
@@ -58,7 +71,8 @@ export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstTy
                         setSelectedTrash(null);
                     }}
                     trashSelected={trashSelected}
-                    setTrashSelected={handleSelectTrash}
+                    onSelectTrash={handleSelectTrash}
+                    onClearSelectedTrash={() => setTrashSelected([])}
                 />
             )}
         </>
@@ -71,12 +85,13 @@ interface MenuOptionsProps {
     pY: number;
     onClose: () => void;
     trashSelected: number[];
-    setTrashSelected(trash: number): void;
+    onSelectTrash(trash: number): void;
+    onClearSelectedTrash(): void;
 }
 
-export function MenuOptions({ onClose, pX, pY, trashId, setTrashSelected, trashSelected }: MenuOptionsProps) {
+export function MenuOptions({ onClose, pX, pY, trashId, onSelectTrash, trashSelected, onClearSelectedTrash }: MenuOptionsProps) {
     function handleSelect() {
-        setTrashSelected(trashId);
+        onSelectTrash(trashId);
     }
 
     useEffect(() => {
@@ -101,10 +116,12 @@ export function MenuOptions({ onClose, pX, pY, trashId, setTrashSelected, trashS
                     </Button>
                 </li>
                 <li>
-                    <Button className="w-full cursor-pointer !bg-transparent text-black hover:!bg-none dark:text-white">
-                        <Trash2 className="text-red-600" />
-                        Excluír definitivamente
-                    </Button>
+                    <TrashRestore
+                        onClear={onClearSelectedTrash}
+                        trash={[trashId]}
+                        isUnit={false}
+                        className="w-full cursor-pointer !bg-transparent text-black hover:!bg-none dark:text-white"
+                    />
                 </li>
             </ul>
         </div>

@@ -13,7 +13,7 @@ interface GalleryListProps {
 export function GalleryList({ data, trashSelected, setTrashSelected, handleRightClick }: GalleryListProps) {
     return (
         <>
-            <div className="grid grid-cols-1 gap-2 rounded-md bg-secondary p-4 xl:grid-cols-6">
+            <div className="grid grid-cols-1 gap-2 xl:grid-cols-6">
                 {data.map(function (d) {
                     const content = JSON.parse(d.content) as PhotoGalleryInterface;
                     return (
