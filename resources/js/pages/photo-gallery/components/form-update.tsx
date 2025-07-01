@@ -9,7 +9,7 @@ import { type PhotoGalleryInterface } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, LoaderCircle } from 'lucide-react';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { PreviewImage } from './preview-photo';
+import { PreviewImage } from '../../../components/preview-photo';
 
 interface FormUpdateProps {
     gallery: PhotoGalleryInterface;

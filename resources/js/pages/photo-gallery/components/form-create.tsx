@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { PreviewImage } from './preview-photo';
+import { PreviewImage } from '../../../components/preview-photo';
 
 export function FormCreate() {
     const [open, setOpen] = useState<boolean>(false);

@@ -1,10 +1,10 @@
 import { ApaeLayout } from '@/layouts/apae-layout';
 import { type BreadcrumbItem, type PhotoGalleryInterface } from '@/types';
 import { Head } from '@inertiajs/react';
+import { PreviewImage } from '../../components/preview-photo';
 import { FormUpdate } from './components/form-update';
 import { GalleryShow } from './components/gallery-show';
 import { GalleryUploads } from './components/gallery-uploads';
-import { PreviewImage } from './components/preview-photo';
 
 interface PageProps {
     data: PhotoGalleryInterface;

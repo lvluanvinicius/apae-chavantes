@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TrashDestroyController;
 use App\Http\Controllers\Admin\TrashGaleryFileController;
 use App\Http\Controllers\Admin\TrashPhotoGalleryController;
@@ -33,4 +34,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::post('trash-restore', TrashRestoreController::class)->name('trash-restore');
     Route::post('trash-destroy', TrashDestroyController::class)->name('trash-destroy');
     Route::resource('trash', DataTrashController::class);
+
+    # Sliders
+    Route::resource('sliders', SliderController::class);
 });

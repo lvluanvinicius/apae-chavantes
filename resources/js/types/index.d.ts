@@ -153,3 +153,9 @@ export interface DataTrashInterface {
     created_at: string | null;
     updated_at: string | null;
 }
+
+export interface SliderInterface {
+    id: number;
+    created_at: string | null;
+    updated_at: string | null;
+}

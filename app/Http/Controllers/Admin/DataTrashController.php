@@ -13,7 +13,7 @@ class DataTrashController extends Controller
 
     public function index(Request $request): InertiaResponse
     {
-        $search   = $request->has('search') ? $request->get('search') : 10;
+        $search   = $request->has('search') ? $request->get('search') : '';
         $paginate = $request->has('paginate') ? $request->get('paginate') : 10;
         $dstType  = $request->has('dst-type') ? $request->get('dst-type') : 'gallery';
 
