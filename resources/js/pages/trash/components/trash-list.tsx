@@ -1,8 +1,12 @@
+import { OptionSelectGallery, SelectGallery } from '@/components/select-gallery';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { type DataTrashInterface, type TrashDstType } from '@/types';
 import { SquareDashedMousePointer } from 'lucide-react';
-import { MouseEvent, useEffect, useState } from 'react';
+import { type MouseEvent, useEffect, useState } from 'react';
+import { DeletePermanently } from './delete-permanently';
+import { GalleryImagesList } from './gallery-images-list';
 import { GalleryList } from './gallery-list';
 import { TrashRestore } from './trash-restore';
 
@@ -10,6 +14,7 @@ export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstTy
     const [trashSelected, setTrashSelected] = useState<number[]>([]);
     const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
     const [selectedTrash, setSelectedTrash] = useState<number | null>(null);
+    const [targeRestoreGalleryImage, setTargeRestoreGalleryImage] = useState<OptionSelectGallery | null>(null);
 
     /**
      * Abre o menu de opções para manipulação de imagens.
@@ -45,17 +50,49 @@ export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstTy
     return (
         <>
             <div className="flex flex-col gap-4 rounded-md bg-secondary p-4">
-                <div className="w-full">
-                    <TrashRestore
-                        onClear={() => setTrashSelected([])}
-                        trash={trashSelected}
-                        isUnit={false}
-                        className="cursor-pointer border bg-transparent text-black hover:!bg-primary dark:text-white"
-                    />
+                <div className="flex w-full justify-between">
+                    {dstType === 'gallery-images' && (
+                        <Label className="flex flex-col gap-2">
+                            <span className="text-muted-foreground">Selecione uma galeria para onde será restaurada as imagens.</span>
+                            <SelectGallery onSelect={(selected) => setTargeRestoreGalleryImage(selected)} selected={targeRestoreGalleryImage} />
+                        </Label>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                        <TrashRestore
+                            onClear={() => {
+                                setTrashSelected([]);
+                                setTargeRestoreGalleryImage(null);
+                            }}
+                            trash={trashSelected}
+                            isUnit={false}
+                            dstType={dstType}
+                            restoreGallery={targeRestoreGalleryImage?.value}
+                            className="cursor-pointer border bg-transparent text-black hover:!bg-primary dark:text-white"
+                        />
+
+                        {trashSelected.length > 0 && (
+                            <DeletePermanently
+                                onClear={() => {
+                                    setTrashSelected([]);
+                                }}
+                                trash={trashSelected}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 {dstType === 'gallery' && (
                     <GalleryList handleRightClick={handleRightClick} data={data} trashSelected={trashSelected} setTrashSelected={handleSelectTrash} />
+                )}
+
+                {dstType === 'gallery-images' && (
+                    <GalleryImagesList
+                        handleRightClick={handleRightClick}
+                        data={data}
+                        trashSelected={trashSelected}
+                        setTrashSelected={handleSelectTrash}
+                    />
                 )}
             </div>
 
@@ -72,7 +109,6 @@ export function TrashList({ data, dstType }: { data: DataTrashInterface[]; dstTy
                     }}
                     trashSelected={trashSelected}
                     onSelectTrash={handleSelectTrash}
-                    onClearSelectedTrash={() => setTrashSelected([])}
                 />
             )}
         </>
@@ -86,10 +122,9 @@ interface MenuOptionsProps {
     onClose: () => void;
     trashSelected: number[];
     onSelectTrash(trash: number): void;
-    onClearSelectedTrash(): void;
 }
 
-export function MenuOptions({ onClose, pX, pY, trashId, onSelectTrash, trashSelected, onClearSelectedTrash }: MenuOptionsProps) {
+export function MenuOptions({ onClose, pX, pY, trashId, onSelectTrash, trashSelected }: MenuOptionsProps) {
     function handleSelect() {
         onSelectTrash(trashId);
     }
@@ -114,14 +149,6 @@ export function MenuOptions({ onClose, pX, pY, trashId, onSelectTrash, trashSele
                         <SquareDashedMousePointer className="text-cyan-400" />
                         Selecionar
                     </Button>
-                </li>
-                <li>
-                    <TrashRestore
-                        onClear={onClearSelectedTrash}
-                        trash={[trashId]}
-                        isUnit={false}
-                        className="w-full cursor-pointer !bg-transparent text-black hover:!bg-none dark:text-white"
-                    />
                 </li>
             </ul>
         </div>

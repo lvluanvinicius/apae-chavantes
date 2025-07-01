@@ -75,7 +75,9 @@ export default function Index({ data }: PageProps) {
             <div className="flex items-center justify-between">
                 <div />
                 <div className="flex items-center gap-2">
-                    {selectedGalleries.length > 0 && <MoveGalleryTrash galleries={selectedGalleries} isUnit={false} />}
+                    {selectedGalleries.length > 0 && (
+                        <MoveGalleryTrash onClearSelected={setSelectedGalleries} galleries={selectedGalleries} isUnit={false} />
+                    )}
                     <Button onClick={selectAllGalleries} size={'sm'} variant={selectedGalleries.length > 0 ? 'default' : 'outline'}>
                         <CheckCheck />
                         {selectedGalleries.length > 0 ? 'Limpar seleção' : 'Selecionar tudo'}
@@ -123,7 +125,7 @@ export default function Index({ data }: PageProps) {
                                             </Button>
                                         </Link>
                                         <FormUpdate gallery={gll} />
-                                        <MoveGalleryTrash galleries={[gll.id]} />
+                                        <MoveGalleryTrash onClearSelected={setSelectedGalleries} galleries={[gll.id]} />
                                     </div>
                                 </div>
                                 <p className="line-clamp-3 w-full text-sm">{gll.gallery_description}</p>

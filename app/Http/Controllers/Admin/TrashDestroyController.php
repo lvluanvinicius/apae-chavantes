@@ -3,27 +3,24 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataTrash;
-use App\Models\GalleryFile;
-use App\Models\PhotoGallery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
-class TrashRestoreController extends Controller
+class TrashDestroyController extends Controller
 {
     public function __invoke(Request $request): RedirectResponse
     {
         try {
-            $trashIds      = $request->trashIds;
-            $targetGallery = $request->targetGallery;
+            $trashIds = $request->trashIds;
 
             if (! isset($trashIds)) {
-                throw new \Exception('Campo trashIds com os Ids a serem restaurados.');
+                throw new \Exception('Campo trashIds com os Ids a serem excluídos.');
             }
 
             if (! is_array($trashIds)) {
-                throw new \Exception('Por favor, informe um array com os ids a serem restaurados.');
+                throw new \Exception('Por favor, informe um array com os ids a serem excluídos.');
             }
 
             $dataTrash = DataTrash::whereIn('id', $trashIds)->get();
@@ -38,29 +35,21 @@ class TrashRestoreController extends Controller
                 $items[$trash->dst_type][] = $trash;
             }
 
-            DB::transaction(function () use ($items, $targetGallery) {
+            $disk = Storage::disk('public');
+
+            DB::transaction(function () use ($items, $disk) {
                 foreach ($items as $key => $itemData) {
                     foreach ($itemData as $trash) {
                         switch ($key) {
                             case 'gallery':
                                 $content = json_decode($trash->content, true);
-                                $gallery = new PhotoGallery($content);
-                                if (PhotoGallery::where('gallery_name', $gallery->gallery_name)->where('id', '!=', $gallery->id)->first()) {
-                                    # Aplica uma hash nos itens restaurados para evitar erro de duplicidade se houver uma galeria com o nome de onde está sendo restaurado.
-                                    $gallery->gallery_name = $gallery->gallery_name . ' ' . Str::random(5);
-                                }
-                                $gallery->save();
+                                $disk->delete($content['gallery_image']);
                                 $trash->delete();
                                 break;
 
                             case 'gallery-images':
-                                if (! $targetGallery) {
-                                    break;
-                                }
-                                $content                 = json_decode($trash->content, true);
-                                $image                   = new GalleryFile($content);
-                                $image->photo_gallery_id = $targetGallery;
-                                $image->save();
+                                $content = json_decode($trash->content, true);
+                                $disk->delete($content['path']);
                                 $trash->delete();
                                 break;
 

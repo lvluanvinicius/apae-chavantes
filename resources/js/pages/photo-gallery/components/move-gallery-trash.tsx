@@ -13,22 +13,28 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
-export function MoveGalleryTrash({ galleries, isUnit = true }: { galleries: number[]; isUnit?: boolean }) {
+export function MoveGalleryTrash({
+    galleries,
+    isUnit = true,
+    onClearSelected,
+}: {
+    galleries: number[];
+    isUnit?: boolean;
+    onClearSelected: (images: number[]) => void;
+}) {
     const [open, setOpen] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
 
     function handleDelete() {
-        setProcessing(true);
         router.post(
             route('admin.photo-gallery-trash'),
             { galleries: galleries },
             {
+                onStart: () => setProcessing(true),
+                onFinish: () => setProcessing(false),
                 onSuccess() {
-                    setProcessing(false);
                     setOpen(false);
-                },
-                onFinish() {
-                    setProcessing(false);
+                    onClearSelected([]);
                 },
             },
         );

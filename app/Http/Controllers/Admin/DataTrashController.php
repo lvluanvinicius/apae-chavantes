@@ -25,4 +25,5 @@ class DataTrashController extends Controller
 
         return inertia('trash/index', ['data' => $data]);
     }
+
 }

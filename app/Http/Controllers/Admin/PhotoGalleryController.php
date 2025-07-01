@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PhotoGalleryCreateRequest;
 use App\Http\Requests\Admin\PhotoGalleryUpdateRequest;
-use App\Models\DataTrash;
 use App\Models\GalleryFile;
 use App\Models\PhotoGallery;
 use App\Models\Setting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +34,28 @@ class PhotoGalleryController extends Controller
 
         $galleries = $query->paginate($paginate);
         return inertia('photo-gallery/index', ['data' => $galleries]);
+    }
+
+    public function json(Request $request): JsonResponse
+    {
+        $search = $request->input('q', ''); // valor padrão: string vazia
+
+        $query = $this->modelPhotoGallery->newQuery();
+
+        if (! empty($search)) {
+            $searchUpper = strtoupper($search);
+
+            $query->where(function ($q) use ($searchUpper) {
+                $q->whereRaw('UPPER(gallery_name) LIKE ?', ['%' . $searchUpper . '%'])
+                    ->orWhereRaw('UPPER(gallery_description) LIKE ?', ['%' . $searchUpper . '%']);
+            });
+        }
+
+        $galleries = $query->paginate(10);
+
+        return response()->json([
+            'data' => $galleries,
+        ]);
     }
 
     /**
@@ -301,6 +323,5 @@ class PhotoGalleryController extends Controller
             ]);
         }
     }
-
 
 }

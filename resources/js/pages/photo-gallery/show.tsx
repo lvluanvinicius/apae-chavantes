@@ -10,18 +10,22 @@ interface PageProps {
     data: PhotoGalleryInterface;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        href: '/dashboard',
-        title: 'Painel de Controle',
-    },
-    {
-        href: '/photo-gallery',
-        title: 'Galeria de Fotos',
-    },
-];
-
 export default function Index({ data }: PageProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            href: '/dashboard',
+            title: 'Painel de Controle',
+        },
+        {
+            href: '/photo-gallery',
+            title: 'Galeria de Fotos',
+        },
+        {
+            href: '',
+            title: data.gallery_name,
+        },
+    ];
+
     return (
         <ApaeLayout title={data.gallery_name} breadcrumbs={breadcrumbs}>
             <Head title={data.gallery_name} />

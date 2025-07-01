@@ -7,12 +7,25 @@ import { transformSearchParams } from '@/tools/urls';
 import { type TrashDstType } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { ListFilter } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { TrashPageProps } from '.';
 import { TrashList } from './components/trash-list';
 
-function Filters({ dstType, setDstType }: { dstType: TrashDstType; setDstType: (v: TrashDstType) => void }) {
+function Filters() {
     const { url } = usePage();
+
+    const [dstType, setDstType] = useState<TrashDstType>(function () {
+        const params: Record<string, string | number> = {};
+        const query = url.split('?')[1];
+        // Inserindo todos os parametros dentro do objeto params.
+        new URLSearchParams(query).forEach((v, k) => (params[k] = v));
+
+        if (params['dst-type']) {
+            return params['dst-type'] as TrashDstType;
+        }
+
+        return 'gallery';
+    });
 
     const [search, setSearch] = useState<string>(function () {
         const params: Record<string, string | number> = {};
@@ -66,7 +79,7 @@ function Filters({ dstType, setDstType }: { dstType: TrashDstType; setDstType: (
                 <h3 className="text-muted-foreground">Filtros</h3>
 
                 <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-                    <Label className="flex w-full flex-col gap-2">
+                    <Label className="sflex hidden w-full flex-col gap-2">
                         <span>Digite algo</span>
                         <Input value={search} placeholder="Galeria..." onChange={(e) => setSearch(e.currentTarget.value)} />
                     </Label>
@@ -124,9 +137,28 @@ export function Page({ data }: TrashPageProps) {
         return 'gallery';
     });
 
+    const handleChangeDstType = useCallback(
+        function () {
+            const params: Record<string, string | number> = {};
+            const query = url.split('?')[1];
+            // Inserindo todos os parametros dentro do objeto params.
+            new URLSearchParams(query).forEach((v, k) => (params[k] = v));
+
+            if (params['dst-type']) {
+                const d = params['dst-type'] as TrashDstType;
+                setDstType(d);
+            }
+        },
+        [url],
+    );
+
+    useEffect(() => {
+        handleChangeDstType();
+    }, [handleChangeDstType]);
+
     return (
         <div className="flex flex-col gap-4">
-            <Filters dstType={dstType} setDstType={setDstType} />
+            <Filters />
             <TrashList data={data.data} dstType={dstType} />
         </div>
     );

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
+use App\Http\Controllers\Admin\TrashDestroyController;
 use App\Http\Controllers\Admin\TrashGaleryFileController;
 use App\Http\Controllers\Admin\TrashPhotoGalleryController;
 use App\Http\Controllers\Admin\TrashRestoreController;
@@ -17,6 +18,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Galeria de Fotos.
     Route::get('storage/{image}', fn() => '')->name('photo-gallery.image');
+    Route::get('photo-gallery-json', [PhotoGalleryController::class, 'json'])->name('photo-gallery-json');
     Route::post('photo-gallery-update/{photo_gallery}', [PhotoGalleryController::class, 'update'])->name('photo-gallery-update');
     Route::resource('photo-gallery', PhotoGalleryController::class);
 
@@ -29,5 +31,6 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Trash
     Route::post('trash-restore', TrashRestoreController::class)->name('trash-restore');
+    Route::post('trash-destroy', TrashDestroyController::class)->name('trash-destroy');
     Route::resource('trash', DataTrashController::class);
 });

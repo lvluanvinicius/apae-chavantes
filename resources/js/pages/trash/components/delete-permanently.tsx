@@ -1,7 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
-import { ArchiveRestore } from 'lucide-react';
-
 import {
     AlertDialog,
     AlertDialogContent,
@@ -11,69 +7,40 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
-import { TrashDstType } from '@/types';
-import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { router } from '@inertiajs/react';
+import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-export function TrashRestore({
-    trash,
-    onClear,
-    restoreGallery,
-    dstType,
-    isUnit = true,
-    className,
-}: {
+interface DeletePermanentlyProps {
     trash: number[];
-    onClear: (v: number[]) => void;
-    restoreGallery?: number;
-    dstType?: TrashDstType;
-    isUnit?: boolean;
-    className?: string;
-}) {
+    onClear: () => void;
+}
+
+export function DeletePermanently({ trash, onClear }: DeletePermanentlyProps) {
     const [open, setOpen] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
 
     function handleDelete() {
-        if (dstType && dstType === 'gallery-images') {
-            if (!restoreGallery) {
-                setError('Por favor, volte e selecione uma galeria para onde gostaria de restaurar as imagens selecionadas.');
-                return;
-            }
-        }
         router.post(
-            route('admin.trash-restore'),
-            { trashIds: trash, targetGallery: restoreGallery },
+            route('admin.trash-destroy'),
+            { trashIds: trash },
             {
                 onStart: () => setProcessing(true),
                 onFinish: () => setProcessing(false),
                 onSuccess() {
                     setOpen(false);
-                    onClear([]);
-                    setError(null);
+                    onClear();
                 },
             },
         );
     }
 
-    useEffect(
-        function () {
-            setError(null);
-        },
-        [open],
-    );
-
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant={'destructive'} size={isUnit ? 'icon' : 'sm'} className={cn(className)}>
-                    {isUnit ? (
-                        <ArchiveRestore />
-                    ) : (
-                        <>
-                            <ArchiveRestore /> Restaurar
-                        </>
-                    )}
+                <Button variant={'destructive'} size={'sm'}>
+                    <Trash2 /> Excluir permanentemente
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -81,20 +48,18 @@ export function TrashRestore({
                     {trash.length > 0 ? (
                         <>
                             <AlertDialogTitle>Deseja realmente prosseguir?</AlertDialogTitle>
-                            <AlertDialogDescription></AlertDialogDescription>
+                            <AlertDialogDescription>
+                                Ao clicar em Confirmar, você concorda que todos os arquivos selecionados serão removidos permanentemente?
+                            </AlertDialogDescription>
                         </>
                     ) : (
                         <>
                             <AlertDialogTitle>Ooops!</AlertDialogTitle>
-                            <AlertDialogDescription>Você precisa selecionar ao menos um item na lixeira para restaurar</AlertDialogDescription>
+                            <AlertDialogDescription>Você precisa selecionar ao menos um item na lixeira para excluir</AlertDialogDescription>
                         </>
                     )}
                 </AlertDialogHeader>
-                {error && (
-                    <div className="my-1 w-full">
-                        <p className="text-sm text-red-500">{error}</p>
-                    </div>
-                )}
+
                 <AlertDialogFooter>
                     <Button
                         variant={'outline'}

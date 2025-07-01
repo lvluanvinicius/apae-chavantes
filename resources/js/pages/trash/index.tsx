@@ -9,7 +9,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
     {
-        title: 'Usuários',
+        title: 'Lixeira',
         href: '/users',
     },
 ];

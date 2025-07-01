@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { NavSidebarItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { Camera, Eye, FileText, Globe, Heart, Home, Image, Newspaper, Users, X } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Camera, Eye, FileText, Globe, Heart, Home, Image, Newspaper, Trash, Users, X } from 'lucide-react';
 import { useTheme } from './theme-provider';
 
 interface SidebarProps {
@@ -10,19 +10,28 @@ interface SidebarProps {
     toggleSidebar: () => void;
 }
 
-const menuItems: NavSidebarItem[] = [
-    { href: '/photo-gallery', icon: Home, title: 'Painel', isActive: true },
-    { href: '/photo-gallery', icon: Globe, title: 'Website', isActive: false },
-    { href: '/photo-gallery', icon: Camera, title: 'Galeria de Fotos', isActive: false },
-    { href: '/photo-gallery', icon: Eye, title: 'Transparência', isActive: false },
-    { href: '/photo-gallery', icon: Users, title: 'Parceiros', isActive: false },
-    { href: '/photo-gallery', icon: Newspaper, title: 'Notícias', isActive: false },
-    { href: '/photo-gallery', icon: Image, title: 'Sliders', isActive: false },
-    { href: '/photo-gallery', icon: FileText, title: 'Estatuto', isActive: false },
-];
+function checkPath(path: string, compare: string) {
+    const r = path.split('/');
+    return r[1].replaceAll(' ', '') === compare;
+}
 
 export default function ApaeSidebar({ isOpen, toggleSidebar }: SidebarProps) {
     const { theme } = useTheme();
+
+    const { url } = usePage();
+
+    const menuItems: NavSidebarItem[] = [
+        { href: '/dashboard', icon: Home, title: 'Painel', isActive: checkPath(url, 'dashboard') },
+        { href: '/', icon: Globe, title: 'Website', isActive: checkPath(url, '') },
+        { href: '/photo-gallery', icon: Camera, title: 'Galeria de Fotos', isActive: checkPath(url, 'photo-gallery') },
+        { href: '/', icon: Eye, title: 'Transparência', isActive: checkPath(url, '') },
+        { href: '/', icon: Users, title: 'Parceiros', isActive: checkPath(url, '') },
+        { href: '/', icon: Newspaper, title: 'Notícias', isActive: checkPath(url, '') },
+        { href: '/', icon: Image, title: 'Sliders', isActive: checkPath(url, '') },
+        { href: '/', icon: FileText, title: 'Estatuto', isActive: checkPath(url, '') },
+        { href: '/users', icon: Users, title: 'Usuários', isActive: checkPath(url, 'users') },
+        { href: '/trash', icon: Trash, title: 'Lixeira', isActive: checkPath(url, 'trash') },
+    ];
 
     return (
         <>
