@@ -110,3 +110,28 @@ export function formatPhone(value: string | number): string {
 
     return onlyNumbers;
 }
+
+export function formatDateTimeMask(input: string): string {
+    const digits = input.replace(/\D/g, '').slice(0, 14); // garante até 14 números
+
+    const day = digits.slice(0, 2);
+    const month = digits.slice(2, 4);
+    const year = digits.slice(4, 8);
+    const hour = digits.slice(8, 10);
+    const minute = digits.slice(10, 12);
+    const second = digits.slice(12, 14);
+
+    let result = '';
+
+    if (day) result += day;
+    if (month) result += '/' + month;
+    if (year) result += '/' + year;
+
+    if (hour) {
+        result += ' às ' + hour;
+        if (minute) result += ':' + minute;
+        if (second) result += ':' + second;
+    }
+
+    return result;
+}

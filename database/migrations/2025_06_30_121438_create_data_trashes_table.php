@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('data_trashes', function (Blueprint $table) {
             $table->id();
 
+            $table->uuid('uuid')->unique();
             $table->enum('dst_type', [
                 'gallery',
                 'gallery-images',

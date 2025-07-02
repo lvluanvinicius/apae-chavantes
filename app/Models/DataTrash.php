@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * dst_type: gallery
@@ -26,6 +27,9 @@ class DataTrash extends Model
 
     protected static function booted()
     {
-        static::creating(fn(DataTrash $model) => $model->deletion_date = now()->addDays(30));
+        static::creating(function (DataTrash $model) {
+            $model->deletion_date = now()->addDays(30);
+            $model->uuid          = (string) Str::uuid();
+        });
     }
 }

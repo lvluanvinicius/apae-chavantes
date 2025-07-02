@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
+use App\Http\Controllers\Admin\SliderCampaignController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TrashDestroyController;
 use App\Http\Controllers\Admin\TrashGaleryFileController;
@@ -17,8 +18,10 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::put('users/{user}/permissions', [PermissionController::class, 'update'])->name('users.permissions.update');
     Route::resource('users', UserController::class);
 
+    # Coringa para carregar as imagens.
+    Route::get('storage/{image?}', fn() => '')->name('photo-gallery.image');
+
     # Galeria de Fotos.
-    Route::get('storage/{image}', fn() => '')->name('photo-gallery.image');
     Route::get('photo-gallery-json', [PhotoGalleryController::class, 'json'])->name('photo-gallery-json');
     Route::post('photo-gallery-update/{photo_gallery}', [PhotoGalleryController::class, 'update'])->name('photo-gallery-update');
     Route::resource('photo-gallery', PhotoGalleryController::class);
@@ -37,4 +40,7 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Sliders
     Route::resource('sliders', SliderController::class);
+
+    # Sliders Campaign.
+    Route::get('sliders-campaign', [SliderCampaignController::class, 'index'])->name('sliders-campaign.index');
 });

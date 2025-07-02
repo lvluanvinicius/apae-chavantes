@@ -156,6 +156,26 @@ export interface DataTrashInterface {
 
 export interface SliderInterface {
     id: number;
+    uuid: string;
+    slider_hash: string;
+    slider_images: SliderImageMap;
+    slider_active: boolean;
+    created_at: string | null;
+    updated_at: string | null;
+}
+
+export interface SliderImageMap {
+    original: string;
+    [size: string]: string; // ex: '1920x600', 'mobile-768x'
+}
+
+export interface SliderCampaignInterface {
+    id: number;
+    uuid: string;
+    description: string;
+    is_running: boolean;
+    start_date: string;
+    end_date: string;
     created_at: string | null;
     updated_at: string | null;
 }

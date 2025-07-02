@@ -10,15 +10,19 @@ class Slider extends Model
      * @var array
      */
     protected $fillable = [
-        "sliders_hash",
-        "sliders_size",
-        "sliders_image",
-        "sliders_format",
-        "sliders_active",
+        "slider_hash",
+        "slider_images",
+        "slider_active",
+    ];
+
+    protected $casts = [
+        'slider_images' => 'array',
+        'slider_active' => 'boolean',
     ];
 
     protected static function booted()
     {
         static::creating(fn(Slider $model) => $model->uuid = (string) Str::uuid());
     }
+
 }
