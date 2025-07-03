@@ -49,7 +49,7 @@ export function CreateSlider() {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Novo Slider</DialogTitle>
-                    <DialogDescription>Escolha uma imagem abaixo e clique em Criar.</DialogDescription>
+                    <DialogDescription>Escolha uma imagem e clique em Criar.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={create}>
                     <div className="flex flex-col gap-4">

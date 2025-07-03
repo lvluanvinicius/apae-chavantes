@@ -111,8 +111,8 @@ export function formatPhone(value: string | number): string {
     return onlyNumbers;
 }
 
-export function formatDateTimeMask(input: string): string {
-    const digits = input.replace(/\D/g, '').slice(0, 14); // garante até 14 números
+export function formatToDateTime(input: string): string {
+    const digits = input.replace(/\D/g, '').slice(0, 14);
 
     const day = digits.slice(0, 2);
     const month = digits.slice(2, 4);
@@ -126,12 +126,41 @@ export function formatDateTimeMask(input: string): string {
     if (day) result += day;
     if (month) result += '/' + month;
     if (year) result += '/' + year;
-
-    if (hour) {
-        result += ' às ' + hour;
-        if (minute) result += ':' + minute;
-        if (second) result += ':' + second;
-    }
+    if (hour) result += ' ' + hour;
+    if (minute) result += ':' + minute;
+    if (second) result += ':' + second;
 
     return result;
+}
+
+export function formatToISODateTime(input: string): string {
+    const digits = input.replace(/\D/g, '').slice(0, 14);
+
+    const year = digits.slice(0, 4);
+    const month = digits.slice(4, 6);
+    const day = digits.slice(6, 8);
+    const hour = digits.slice(8, 10);
+    const minute = digits.slice(10, 12);
+    const second = digits.slice(12, 14);
+
+    let result = '';
+
+    if (year) result += year;
+    if (month) result += '/' + month;
+    if (day) result += '/' + day;
+    if (hour) result += ' ' + hour;
+    if (minute) result += ':' + minute;
+    if (second) result += ':' + second;
+
+    return result;
+}
+
+export function convertISOToBRDateTime(input: string): string {
+    const match = input.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})$/);
+
+    if (!match) return input; // Retorna original se não for válido
+
+    const [, year, month, day, hour, minute, second] = match;
+
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
 }

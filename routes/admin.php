@@ -42,5 +42,6 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::resource('sliders', SliderController::class);
 
     # Sliders Campaign.
-    Route::get('sliders-campaign', [SliderCampaignController::class, 'index'])->name('sliders-campaign.index');
+    // Route::get('sliders-campaign', [SliderCampaignController::class, 'index'])->name('sliders-campaign.index');
+    Route::resource('sliders-campaign', SliderCampaignController::class);
 });

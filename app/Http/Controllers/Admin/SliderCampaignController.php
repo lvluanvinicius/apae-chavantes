@@ -2,13 +2,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SliderCampaignCreateRequest;
+use App\Http\Requests\Admin\SliderCampaignUpdateRequest;
 use App\Models\SliderCampaign;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SliderCampaignController extends Controller
 {
-    public function __construct(protected SliderCampaign $modelDliderCampaign)
+    public function __construct(protected SliderCampaign $modelSliderCampaign)
     {}
 
     /**
@@ -16,9 +19,9 @@ class SliderCampaignController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $search = $request->input('q', ''); // valor padrão: string vazia
+        $search = $request->input('search', ''); // valor padrão: string vazia
 
-        $query = $this->modelDliderCampaign->newQuery();
+        $query = $this->modelSliderCampaign->newQuery();
 
         if (! empty($search)) {
             $searchUpper = strtoupper($search);
@@ -38,33 +41,35 @@ class SliderCampaignController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(SliderCampaignCreateRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'description' => 'required',
-                'start_date'  => 'required',
-                'end_date'    => 'required',
-            ]);
-
             $data = $request->only(['description', 'start_date', 'end_date', 'is_running']);
 
-            ! $this->modelDliderCampaign->create($data) && throw new \Exception('Houve um erro ao tentar criar a campanha.');
+            // Limpando datas.
+            $data['start_date'] = str_replace(' às ', ' ', $data['start_date']);
+            $data['end_date']   = str_replace(' às ', ' ', $data['end_date']);
 
-            return redirect()->back()->with('success', 'Campanha criada com sucesso.');
+            // Transformando em timestamp e comparando se data de inicio é menor que data final.
+            $startDate = Carbon::createFromFormat('d/m/Y H:i:s', $data['start_date']);
+            $endDate   = Carbon::createFromFormat('d/m/Y H:i:s', $data['end_date']);
+            if ($startDate->timestamp >= $endDate->timestamp) {
+                return $this->errorResponse('A data de início deve ser menor que a data final.', 400);
+            }
+
+            $data['start_date'] = $startDate->format('Y-m-d H:i:s');
+            $data['end_date']   = $endDate->format('Y-m-d H:i:s');
+
+            if (! $this->modelSliderCampaign->create($data)) {
+                return $this->errorResponse('Houve um erro ao tentar criar a campanha.', 400);
+            }
+
+            return $this->successResponse([], 'Campanha criada com sucesso.');
 
         } catch (\Exception $error) {
-            return redirect()->back()->with('error', $error->getMessage());
+            return $this->errorResponse($error->getMessage(), 500);
         }
     }
 
@@ -73,30 +78,74 @@ class SliderCampaignController extends Controller
      */
     public function show(string $id)
     {
-        //
+        if (! $campaign = $this->modelSliderCampaign->where('id', $id)->first()) {
+            return $this->errorResponse('Campanha não encontrada.', 404);
+        }
+
+        return $this->successResponse($campaign, 'Campanha recuperada com sucesso.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Atualiza um registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     * @param \App\Http\Requests\Admin\SliderCampaignUpdateRequest $request
+     * @param string $id
+     * @return JsonResponse
      */
-    public function edit(string $id)
+    public function update(SliderCampaignUpdateRequest $request, string $id): JsonResponse
     {
-        //
+        try {
+            $data = $request->only(['description', 'start_date', 'end_date', 'is_running']);
+
+            if (! $campaign = $this->modelSliderCampaign->where('id', $id)->first()) {
+                return $this->errorResponse('Campanha não encontrada.', 404);
+            }
+
+            // Limpando datas.
+            $data['start_date'] = str_replace(' às ', ' ', $data['start_date']);
+            $data['end_date']   = str_replace(' às ', ' ', $data['end_date']);
+
+            // Transformando em timestamp e comparando se data de inicio é menor que data final.
+            $startDate = Carbon::createFromFormat('d/m/Y H:i:s', $data['start_date']);
+            $endDate   = Carbon::createFromFormat('d/m/Y H:i:s', $data['end_date']);
+            if ($startDate->timestamp >= $endDate->timestamp) {
+                return $this->errorResponse('A data de início deve ser menor que a data final.', 400);
+            }
+
+            $data['start_date'] = $startDate->format('Y-m-d H:i:s');
+            $data['end_date']   = $endDate->format('Y-m-d H:i:s');
+
+            if (! $campaign->update($data)) {
+                return $this->errorResponse('Houve um erro ao tentar atualizar a campanha.', 400);
+            }
+
+            return $this->successResponse([], 'Campanha atualizada com sucesso.');
+
+        } catch (\Exception $error) {
+            return $this->errorResponse($error->getMessage(), 500);
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * @exclui um registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     * @param string $id
+     * @return JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function destroy(string $id): JsonResponse
     {
-        //
-    }
+        try {
+            if (! $campaign = $this->modelSliderCampaign->where('id', $id)->first()) {
+                return $this->errorResponse('Campanha não encontrada.', 404);
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            if ($campaign->delete()) {
+                return $this->errorResponse('Houve um erro ao tentar excluír a campanha.', 400);
+            }
+
+            return $this->successResponse([], 'Campanha excluída com sucesso.');
+        } catch (\Exception $error) {
+            return $this->errorResponse($error->getMessage(), 500);
+        }
     }
 }

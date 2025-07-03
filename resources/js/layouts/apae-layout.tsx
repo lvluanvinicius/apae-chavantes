@@ -1,6 +1,7 @@
 import ApaeHeader from '@/components/apae-header';
 import Sidebar from '@/components/apae-sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ApaeSonner } from '@/hooks/apae-sonner';
 import { type BreadcrumbItem } from '@/types';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 
@@ -18,6 +19,8 @@ export function ApaeLayout({ children, title, breadcrumbs = [] }: ApaeLayout) {
 
     return (
         <ThemeProvider defaultTheme="light" storageKey="appearance">
+            <ApaeSonner />
+
             <div className="flex h-screen bg-background">
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
