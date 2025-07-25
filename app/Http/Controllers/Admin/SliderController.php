@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Slider;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,13 @@ class SliderController extends Controller
 {
     public function __construct(protected Slider $modelSlider)
     {}
+
     /**
-     * Display a listing of the resource.
+     * Retorna listagem de todos os registros.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @return InertiaResponse
      */
     public function index(Request $request): InertiaResponse
     {
@@ -42,22 +48,33 @@ class SliderController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Retorna os sliders em formato json.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @return JsonResponse
      */
-    public function create()
+    public function slidersJson(): JsonResponse
     {
-        //
+        $data = $this->modelSlider->paginate(10);
+
+        return $this->successResponse($data, 'Sliders recuperados com sucesso.');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria um novo registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws Exception
      */
     public function store(Request $request): RedirectResponse
     {
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+        ]);
+
         try {
-            $request->validate([
-                'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
-            ]);
 
             $image = $request->file('image');
             $ext   = $image->getClientOriginalExtension();
@@ -94,46 +111,151 @@ class SliderController extends Controller
                 $this->modelSlider->create([
                     'slider_hash'   => $hash,
                     'slider_images' => $paths,
-                    'slider_active' => true,
+                    'slider_active' => false,
                 ]);
             });
 
             return redirect()->back()->with('success', 'Slider criado com sucesso.');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erro ao criar slider: ' . $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Display the specified resource.
+     * Atualiza um registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @param string $id
+     * @return RedirectResponse
+     * @throws Exception
      */
-    public function show(string $id)
+    public function update(Request $request, string $id): RedirectResponse
     {
-        //
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+        ]);
+
+        try {
+            if (! $slider = $this->modelSlider->where('id', $id)->first()) {
+                throw new \Exception('Slider não encontrado.');
+            }
+
+            $image = $request->file('image');
+            $ext   = $image->getClientOriginalExtension();
+
+            $uuid         = (string) Str::uuid();
+            $hash         = 'slider-' . md5($uuid . now());
+            $folder       = now()->format('Ymd');
+            $baseFilename = "$hash";
+            $paths        = [];
+
+            $manager = ImageManager::gd();
+            $img     = $manager->read($image->getPathname());
+
+            $sizes = [
+                'original'    => fn($img)    => $img,
+                '1920x600'    => fn($img)    => $img->cover(1920, 600),
+                '1024x300'    => fn($img)    => $img->cover(1024, 300),
+                'mobile-768x' => fn($img) => $img->scale(width: 768),
+            ];
+
+            // Iniciando transação de atualização das imagens.
+            DB::transaction(function () use ($slider, $sizes, $paths, $img, $baseFilename, $ext, $folder, $hash) {
+                // Remover imagem anterior.
+                $disk = Storage::disk('public');
+
+                // Removendo imagens anteriores.
+                foreach ($slider->slider_images as $imagePathRemove) {
+                    if ($disk->exists($imagePathRemove)) {
+                        $disk->delete($imagePathRemove);
+                    }
+                }
+
+                // Salvando novas imagens ao path.
+                foreach ($sizes as $suffix => $fn) {
+                    $processed = $fn(clone $img);
+                    $filename  = $suffix === 'original'
+                    ? "{$baseFilename}.{$ext}"
+                    : "{$baseFilename}-{$suffix}.{$ext}";
+
+                    $path = "sliders/{$folder}/{$filename}";
+                    Storage::disk('public')->put($path, $processed->encode());
+
+                    $paths[$suffix] = $path;
+                }
+
+                $slider->update([
+                    'slider_hash'   => $hash,
+                    'slider_images' => $paths,
+                ]);
+            });
+
+            return redirect()->back()->with('success', 'Slider atualizado com sucesso.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Ativa e desativa o status de exibição do slider.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param string $id
+     * @return RedirectResponse
+     * @throws Exception
      */
-    public function edit(string $id)
+    public function activeAndInactive(string $id): RedirectResponse
     {
-        //
+        try {
+            // Recuperar slider.
+            if (! $slider = $this->modelSlider->where('id', $id)->first()) {
+                throw new \Exception('Slider não encontrado.');
+            }
+
+            $slider->update(['slider_active' => ! $slider->slider_active]);
+
+            return redirect()->back()->with('success', 'Status do slider alterado com sucesso.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Exclui um registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param string $id
+     * @return RedirectResponse
+     * @throws Exception
      */
-    public function update(Request $request, string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
-    }
+        try {
+            // Recuperar slider.
+            if (! $slider = $this->modelSlider->where('id', $id)->first()) {
+                throw new \Exception('Slider não encontrado.');
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            # Excluír registro e imagens.
+            DB::transaction(function () use ($slider) {
+                // Remover imagem anterior.
+                $disk = Storage::disk('public');
+
+                // Removendo imagens anteriores.
+                foreach ($slider->slider_images as $imagePathRemove) {
+                    if ($disk->exists($imagePathRemove)) {
+                        $disk->delete($imagePathRemove);
+                    }
+                }
+
+                $slider->delete();
+            });
+
+            return redirect()->back()->with('success', 'Slider excluído com sucesso.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

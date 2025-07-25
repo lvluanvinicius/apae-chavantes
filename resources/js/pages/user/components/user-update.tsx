@@ -57,12 +57,12 @@ export function UserUpdate({ user }: UserCreateProps) {
                 </Button>
             </DialogTrigger>
             <DialogContent className="!w-full max-w-[80vh]">
-                <DialogHeader className="px-8">
+                <DialogHeader className="">
                     <DialogTitle>Novo usuário</DialogTitle>
                     <DialogDescription>Crie um novo usuário</DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={save} className="max-h-[100vh] overflow-auto p-8">
+                <form onSubmit={save} className="max-h-[100vh] overflow-auto">
                     <Label className="mb-4 grid grid-cols-1 items-center md:grid-cols-2">
                         <div>
                             <span className="text-muted-foreground">

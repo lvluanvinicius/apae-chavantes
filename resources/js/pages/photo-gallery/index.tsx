@@ -94,7 +94,7 @@ export default function Index({ data }: PageProps) {
                         <div
                             key={gll.id}
                             className={cn(
-                                'flex h-52 items-center rounded-lg border-2 border-transparent bg-white p-2 shadow-md shadow-black/20 dark:bg-secondary',
+                                'flex h-60 items-center rounded-lg border-2 border-transparent bg-white p-2 shadow-md shadow-black/20 dark:bg-secondary',
                                 selectedGalleries.includes(gll.id) && 'border-primary',
                             )}
                             onContextMenu={(e) => handleRightClick(e, gll.id)}

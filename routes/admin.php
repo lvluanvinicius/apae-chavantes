@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DataTrashController;
+use App\Http\Controllers\Admin\MoveDataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
@@ -34,11 +35,15 @@ Route::middleware('auth')->as('admin.')->group(function () {
     Route::post('photo-gallery/uploads/{photo_gallery}', PhotoGalleryFileUploadController::class)->name('photo-gallery.uploads');
 
     # Trash
+    Route::post('trash-move', MoveDataTrashController::class)->name('trash-restore');
     Route::post('trash-restore', TrashRestoreController::class)->name('trash-restore');
     Route::post('trash-destroy', TrashDestroyController::class)->name('trash-destroy');
     Route::resource('trash', DataTrashController::class);
 
     # Sliders
+    Route::get('sliders-json', [SliderController::class, 'slidersJson'])->name('sliders.sliders-json');
+    Route::post('sliders/{photo_gallery}', [SliderController::class, 'update'])->name('sliders.update');
+    Route::put('sliders/{photo_gallery}/active-and-inactive', [SliderController::class, 'activeAndInactive'])->name('sliders.active-and-inactive');
     Route::resource('sliders', SliderController::class);
 
     # Sliders Campaign.

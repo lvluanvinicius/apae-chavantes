@@ -36,6 +36,13 @@ class PhotoGalleryController extends Controller
         return inertia('photo-gallery/index', ['data' => $galleries]);
     }
 
+    /**
+     * Retorna uma listagem JSON dos registros de galerias.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function json(Request $request): JsonResponse
     {
         $search = $request->input('q', ''); // valor padrão: string vazia
@@ -133,7 +140,7 @@ class PhotoGalleryController extends Controller
             });
 
             return redirect()->route('admin.photo-gallery.index')->with([
-                'error' => 'Galeria criada com sucesso.',
+                'success' => 'Galeria criada com sucesso.',
             ]);
 
         } catch (\Exception $error) {

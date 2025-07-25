@@ -15,7 +15,11 @@ class SliderCampaignController extends Controller
     {}
 
     /**
-     * Display a listing of the resource.
+     * Retorna todos os registros de campanhas.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -41,7 +45,11 @@ class SliderCampaignController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria um novo registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param SliderCampaignCreateRequest $request
+     * @return JsonResponse
      */
     public function store(SliderCampaignCreateRequest $request): JsonResponse
     {
@@ -74,9 +82,13 @@ class SliderCampaignController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Exibe um registro.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param string $id
+     * @return JsonResponse
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         if (! $campaign = $this->modelSliderCampaign->where('id', $id)->first()) {
             return $this->errorResponse('Campanha não encontrada.', 404);
@@ -139,7 +151,7 @@ class SliderCampaignController extends Controller
                 return $this->errorResponse('Campanha não encontrada.', 404);
             }
 
-            if ($campaign->delete()) {
+            if (! $campaign->delete()) {
                 return $this->errorResponse('Houve um erro ao tentar excluír a campanha.', 400);
             }
 

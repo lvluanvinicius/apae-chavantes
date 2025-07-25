@@ -9,12 +9,22 @@ import { messages } from '@/data/messages';
 import { cn } from '@/lib/utils';
 import { queryClient } from '@/services/react-query';
 import { convertISOToBRDateTime, dateExtFormatter, formatToDateTime } from '@/tools/formatter';
-import { ActionsResponse, SliderCampaignInterface } from '@/types';
+import { ActionsResponse, ApiResponse, SliderCampaignInterface, SliderInterface } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
-import { Edit, LoaderCircle } from 'lucide-react';
+import { Edit, LoaderCircle, Sliders, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
+
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export function SliderCampaingn() {
     const [open, setOpen] = useState<boolean>(false);
@@ -114,7 +124,9 @@ function TableSliderCampaingn({ data }: { data: SliderCampaignInterface[] | null
                                 <TableCell className="border-b-4 py-4 whitespace-nowrap">{dateExtFormatter(d.end_date)}</TableCell>
                                 <TableCell className="border-b-4 py-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2">
+                                        <SelectSliders />
                                         <UpdateSliderCampaingn campaign={d} />
+                                        <DeleteCampaing campaingnId={d.id} />
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -272,8 +284,6 @@ function CreateSliderCampaingn() {
 }
 
 function UpdateSliderCampaingn({ campaign }: { campaign: SliderCampaignInterface }) {
-    console.log(campaign);
-
     const [open, setOpen] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
     const [data, setData] = useState({
@@ -350,7 +360,7 @@ function UpdateSliderCampaingn({ campaign }: { campaign: SliderCampaignInterface
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant={'outline'} className="h-9">
+                <Button variant={'outline'} size={'icon'} className="h-9">
                     <Edit />
                 </Button>
             </DialogTrigger>
@@ -409,11 +419,182 @@ function UpdateSliderCampaingn({ campaign }: { campaign: SliderCampaignInterface
                                     <LoaderCircle className="h-4 w-4 animate-spin" /> Aguarde...
                                 </>
                             ) : (
-                                'Criar'
+                                'Atualizar'
                             )}
                         </Button>
                     </DialogFooter>
                 </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function DeleteCampaing({ campaingnId }: { campaingnId: number }) {
+    const [open, setOpen] = useState<boolean>(false);
+    const [processing, setProcessing] = useState<boolean>(false);
+
+    const { mutateAsync: destroy } = useMutation({
+        mutationFn: async function () {
+            try {
+                const response = await axios.delete<ActionsResponse<[]>>(route('admin.sliders-campaign.destroy', [campaingnId]));
+
+                if (response.status === 200 && response.data) {
+                    if (response.data.status) {
+                        setProcessing(false);
+                        setOpen(false);
+                        queryClient.invalidateQueries({
+                            queryKey: ['slider-campaigns'],
+                        });
+                        return toast.success(response.data.message);
+                    } else {
+                        throw new Error(response.data.message);
+                    }
+                }
+
+                throw new Error(messages.frontend.axiosUnknown);
+            } catch (error) {
+                if (error instanceof AxiosError && error.response) {
+                    const response = error.response.data as ActionsResponse<[]>;
+
+                    return toast.error(response.message);
+                }
+
+                if (error instanceof Error && error) {
+                    setProcessing(false);
+                    return toast.error(error.message);
+                }
+
+                toast.error(messages.frontend.axiosUnknown);
+                setProcessing(false);
+            }
+        },
+    });
+
+    async function handleDelete() {
+        setProcessing(true);
+
+        await destroy();
+    }
+
+    return (
+        <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogTrigger asChild>
+                <Button variant={'destructive'} size={'icon'}>
+                    <Trash2 />
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Deseja realmente prosseguir?</AlertDialogTitle>
+                    <AlertDialogDescription></AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <Button
+                        variant={'outline'}
+                        onClick={() => {
+                            setProcessing(false);
+                            setOpen(false);
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete}>
+                        {processing ? (
+                            <>
+                                <LoaderCircle className="h-4 w-4 animate-spin" /> Aguarde...
+                            </>
+                        ) : (
+                            'Confirmar'
+                        )}
+                    </Button>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+}
+
+function SelectSliders() {
+    const [open, setOpen] = useState<boolean>(false);
+    const [processing, setProcessing] = useState<boolean>(false);
+    const [selected, setSelected] = useState<number[]>([]);
+
+    const { data } = useQuery({
+        queryKey: ['sliders'],
+        queryFn: async () => {
+            const response = await axios.get<ActionsResponse<ApiResponse<SliderInterface[]>>>('/sliders-json');
+
+            if (response.status === 200 && response.data) {
+                return response.data.data;
+            }
+
+            return null;
+        },
+        enabled: !!open,
+    });
+
+    function handleSelect(sliderId: number) {
+        setSelected((state) => {
+            if (state.includes(sliderId)) {
+                return state.filter((id) => id !== sliderId);
+            }
+
+            return [...state, sliderId];
+        });
+    }
+
+    function handleChange() {
+        console.log(selected);
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant={'outline'} size={'icon'} className="h-9">
+                    <Sliders />
+                </Button>
+            </DialogTrigger>
+
+            <DialogContent className="md:!max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Selecionar Slider da Campanha</DialogTitle>
+                    <DialogDescription></DialogDescription>
+                </DialogHeader>
+
+                <div className="grid grid-cols-1 gap-2 border p-4 md:grid-cols-3">
+                    {data &&
+                        data.data.map(function (d) {
+                            return (
+                                <div key={d.id} className="relative w-full rounded-xl border md:h-36" onClick={() => handleSelect(d.id)}>
+                                    <div
+                                        className={cn(
+                                            'absolute h-full w-full rounded-[inherit] bg-black/60',
+                                            selected.includes(d.id) ? 'opacity-100' : 'opacity-0',
+                                        )}
+                                    />
+                                    <img
+                                        className="h-full w-full rounded-[inherit]"
+                                        src={route('admin.photo-gallery.image', [d.slider_images['original']])}
+                                        alt={`Imagem da galeria - ${d.slider_images['original']}`}
+                                    />
+                                </div>
+                            );
+                        })}
+                </div>
+
+                <div className="flex w-full items-center justify-end gap-4">
+                    <Button size={'sm'} onClick={() => handleChange()}>
+                        {processing ? (
+                            <>
+                                <LoaderCircle className="h-4 w-4 animate-spin" /> Aguarde...
+                            </>
+                        ) : (
+                            'Alterar'
+                        )}
+                    </Button>
+                    <Button size={'sm'} onClick={() => setOpen(false)} variant={'outline'}>
+                        Cancelar
+                    </Button>
+                </div>
             </DialogContent>
         </Dialog>
     );
