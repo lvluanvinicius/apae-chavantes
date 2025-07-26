@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -37,12 +38,22 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = ['Desenvolvido por Luan Santos', 'Luan Santos'];
 
+        /**
+         * @var User|null
+         */
+        $user = $request->user();
+
+        // ! $user ? $user->translate = 'pt-BR' : ['translate' => 'pt-BR'];
+        if ($user) {$user->translate = 'pt-BR';} else {
+            $user['translate'] = 'pt-BR';
+        }
+
         return [
              ...parent::share($request),
             'name'        => config('app.name'),
             'quote'       => ['message' => trim($message), 'author' => trim($author)],
             'auth'        => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
             'ziggy'       => fn(): array      => [
                  ...(new Ziggy)->toArray(),

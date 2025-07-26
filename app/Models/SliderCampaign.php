@@ -14,6 +14,7 @@ class SliderCampaign extends Model
         "is_running",
         "start_date",
         "end_date",
+        "sliders",
     ];
 
     /**
@@ -21,6 +22,7 @@ class SliderCampaign extends Model
      */
     protected $casts = [
         "is_running" => "boolean",
+        "sliders"    => "array",
     ];
 
     protected static function booted()

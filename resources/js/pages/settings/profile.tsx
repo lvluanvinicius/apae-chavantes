@@ -9,15 +9,9 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslate } from '@/hooks/use-translate';
 import { ApaeLayout } from '@/layouts/apae-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Meu perfil',
-        href: '/settings/profile',
-    },
-];
 
 type ProfileForm = {
     name: string;
@@ -26,6 +20,18 @@ type ProfileForm = {
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
+    const translate = useTranslate({ locale: auth.user.translate });
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: translate['breadcrumbs']['dashboard'],
+            href: '/dashboard',
+        },
+        {
+            title: translate['breadcrumbs']['settings-profile'],
+            href: '/settings/profile',
+        },
+    ];
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,

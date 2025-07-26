@@ -1,3 +1,12 @@
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -12,19 +21,9 @@ import { convertISOToBRDateTime, dateExtFormatter, formatToDateTime } from '@/to
 import { ActionsResponse, ApiResponse, SliderCampaignInterface, SliderInterface } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
-import { Edit, LoaderCircle, Sliders, Trash2 } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { CheckSquare, Edit, LoaderCircle, Sliders, Square, Trash2 } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
-import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 export function SliderCampaingn() {
     const [open, setOpen] = useState<boolean>(false);
@@ -86,6 +85,7 @@ function TableSliderCampaingn({ data }: { data: SliderCampaignInterface[] | null
                     <TableHead className="border-b-4 py-4 whitespace-nowrap">Status</TableHead>
                     <TableHead className="border-b-4 py-4 whitespace-nowrap">Início</TableHead>
                     <TableHead className="border-b-4 py-4 whitespace-nowrap">Fim</TableHead>
+                    <TableHead className="border-b-4 py-4 whitespace-nowrap"></TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -124,7 +124,7 @@ function TableSliderCampaingn({ data }: { data: SliderCampaignInterface[] | null
                                 <TableCell className="border-b-4 py-4 whitespace-nowrap">{dateExtFormatter(d.end_date)}</TableCell>
                                 <TableCell className="border-b-4 py-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2">
-                                        <SelectSliders />
+                                        <SelectSliders campaingnId={d.id} sliders={d.sliders || []} />
                                         <UpdateSliderCampaingn campaign={d} />
                                         <DeleteCampaing campaingnId={d.id} />
                                     </div>
@@ -302,7 +302,7 @@ function UpdateSliderCampaingn({ campaign }: { campaign: SliderCampaignInterface
         });
     }
 
-    const { mutateAsync: create } = useMutation({
+    const { mutateAsync: update } = useMutation({
         mutationFn: async function () {
             try {
                 const response = await axios.put<ActionsResponse<[]>>(`/sliders-campaign/${campaign.id}`, data);
@@ -354,8 +354,21 @@ function UpdateSliderCampaingn({ campaign }: { campaign: SliderCampaignInterface
         event.preventDefault();
         setProcessing(true);
 
-        await create();
+        await update();
     }
+
+    useEffect(
+        function () {
+            if (open) {
+                setData({
+                    description: campaign.description,
+                    start_date: convertISOToBRDateTime(campaign.start_date),
+                    end_date: convertISOToBRDateTime(campaign.end_date),
+                });
+            }
+        },
+        [open, campaign, setData],
+    );
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -513,10 +526,10 @@ function DeleteCampaing({ campaingnId }: { campaingnId: number }) {
     );
 }
 
-function SelectSliders() {
+function SelectSliders({ campaingnId, sliders }: { campaingnId: number; sliders: number[] }) {
     const [open, setOpen] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
-    const [selected, setSelected] = useState<number[]>([]);
+    const [selected, setSelected] = useState<number[]>(sliders);
 
     const { data } = useQuery({
         queryKey: ['sliders'],
@@ -542,8 +555,53 @@ function SelectSliders() {
         });
     }
 
-    function handleChange() {
-        console.log(selected);
+    /**
+     * Altera os sliders da campanha.
+     */
+    const { mutateAsync: addSlider } = useMutation({
+        mutationFn: async function () {
+            try {
+                const response = await axios.post<ActionsResponse<[]>>(route('admin.sliders-campaign.add-slider', [campaingnId]), {
+                    sliders: selected,
+                });
+
+                if (response.status === 200 && response.data) {
+                    if (response.data.status) {
+                        setProcessing(false);
+                        setOpen(false);
+                        queryClient.invalidateQueries({
+                            queryKey: ['slider-campaigns'],
+                        });
+                        return toast.success(response.data.message);
+                    } else {
+                        throw new Error(response.data.message);
+                    }
+                }
+
+                throw new Error(messages.frontend.axiosUnknown);
+            } catch (error) {
+                if (error instanceof AxiosError && error.response) {
+                    const response = error.response.data as ActionsResponse<[]>;
+
+                    return toast.error(response.message);
+                }
+
+                if (error instanceof Error && error) {
+                    setProcessing(false);
+                    return toast.error(error.message);
+                }
+
+                toast.error(messages.frontend.axiosUnknown);
+                setProcessing(false);
+            }
+        },
+    });
+
+    // Chama a alteração.
+    async function handleChange() {
+        setProcessing(true);
+
+        await addSlider();
     }
 
     return (
@@ -564,13 +622,15 @@ function SelectSliders() {
                     {data &&
                         data.data.map(function (d) {
                             return (
-                                <div key={d.id} className="relative w-full rounded-xl border md:h-36" onClick={() => handleSelect(d.id)}>
+                                <div key={d.id} className="relative w-full rounded-md border md:h-36" onClick={() => handleSelect(d.id)}>
                                     <div
                                         className={cn(
-                                            'absolute h-full w-full rounded-[inherit] bg-black/60',
-                                            selected.includes(d.id) ? 'opacity-100' : 'opacity-0',
+                                            'absolute h-full w-full rounded-[inherit] bg-transparent p-1',
+                                            selected.includes(d.id) && 'bg-black/60',
                                         )}
-                                    />
+                                    >
+                                        {selected.includes(d.id) ? <CheckSquare className="text-primary" /> : <Square />}
+                                    </div>
                                     <img
                                         className="h-full w-full rounded-[inherit]"
                                         src={route('admin.photo-gallery.image', [d.slider_images['original']])}

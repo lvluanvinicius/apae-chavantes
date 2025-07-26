@@ -11,6 +11,14 @@ class PermissionController extends Controller
     public function __construct(protected User $modelUser)
     {}
 
+    /**
+     * Atualiza as permissões de um usuário.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param PermissionUpdateRequest $request
+     * @param string $id
+     * @return RedirectResponse
+     */
     public function update(PermissionUpdateRequest $request, string $id): RedirectResponse
     {
         try {

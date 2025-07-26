@@ -139,7 +139,36 @@ class SliderCampaignController extends Controller
     }
 
     /**
-     * @exclui um registro.
+     * Altera os sliders da campanha.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function addSlider(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate([
+            'sliders' => 'required|array',
+        ]);
+
+        try {
+            if (! $campaign = $this->modelSliderCampaign->where('id', $id)->first()) {
+                return $this->errorResponse('Campanha não encontrada.', 404);
+            }
+
+            if (! $campaign->update($data)) {
+                return $this->errorResponse('Houve um erro ao tentar atualizar os sliders da campanha.', 400);
+            }
+
+            return $this->successResponse($data, 'Alteração efetuada com sucesso.');
+        } catch (\Exception $error) {
+            return $this->errorResponse($error->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Exclui um registro.
      * @author Luan Santos <lvluansantos@gmail.com>
      * @param string $id
      * @return JsonResponse

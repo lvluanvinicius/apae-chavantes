@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\MoveDataTrashController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderCampaignController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TrashDestroyController;
@@ -48,5 +49,9 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Sliders Campaign.
     // Route::get('sliders-campaign', [SliderCampaignController::class, 'index'])->name('sliders-campaign.index');
+    Route::post('sliders-campaign/{sliders_campaign}/add-slider', [SliderCampaignController::class, 'addSlider'])->name('sliders-campaign.add-slider');
     Route::resource('sliders-campaign', SliderCampaignController::class);
+
+    # Configurações.
+    Route::resource('settings', SettingController::class);
 });

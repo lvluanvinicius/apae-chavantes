@@ -1,5 +1,9 @@
+import { breadcrumbs } from '@/data/pt-br';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
+
+export type LocaleType = 'en' | 'pt-BR';
+export type TranslateBreadcrumbType = keyof typeof breadcrumbs;
 
 export interface Auth {
     user: User;
@@ -53,6 +57,7 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    translate: LocaleType;
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -178,4 +183,5 @@ export interface SliderCampaignInterface {
     end_date: string;
     created_at: string | null;
     updated_at: string | null;
+    sliders: number[] | null;
 }

@@ -13,6 +13,10 @@ import { ApaeLayout } from '@/layouts/apae-layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
+        title: 'Painel de Controle',
+        href: '/dashboard',
+    },
+    {
         title: 'Minha senha',
         href: '/settings/password',
     },
