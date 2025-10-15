@@ -21,7 +21,7 @@ export function ApaeLayout({ children, title, breadcrumbs = [] }: ApaeLayout) {
         <ThemeProvider defaultTheme="light" storageKey="appearance">
             <ApaeSonner />
 
-            <div className="flex h-screen bg-background">
+            <div className="flex h-screen">
                 <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
                 <div className="flex flex-1 flex-col overflow-hidden">

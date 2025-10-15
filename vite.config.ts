@@ -23,7 +23,15 @@ export default defineConfig({
         },
     },
     server: {
-        host: 'localhost',
-        port: 5175
+        host: '0.0.0.0',
+        origin: 'http://191.37.38.59:5175',
+        port: 5175,
+        cors: {
+            origin: [
+                'http://website-dev.apaechavantes.org.br:8001',
+                'http://blog-dev.apaechavantes.org.br:8001',
+                'http://app-dev.apaechavantes.org.br:8001',
+            ],
+        },
     },
 });

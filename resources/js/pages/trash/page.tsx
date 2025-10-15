@@ -75,13 +75,18 @@ function Filters() {
 
     return (
         <>
-            <form onSubmit={handleFilter} className="flex flex-col gap-4 rounded-md border p-4 shadow-md shadow-black/20 md:p-8 dark:bg-secondary">
+            <form onSubmit={handleFilter} className="flex flex-col gap-4 rounded-md border bg-secondary p-4 shadow-md shadow-black/20 md:p-8">
                 <h3 className="text-muted-foreground">Filtros</h3>
 
                 <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
                     <Label className="sflex hidden w-full flex-col gap-2">
                         <span>Digite algo</span>
-                        <Input value={search} placeholder="Galeria..." onChange={(e) => setSearch(e.currentTarget.value)} />
+                        <Input
+                            className="!bg-background"
+                            value={search}
+                            placeholder="Galeria..."
+                            onChange={(e) => setSearch(e.currentTarget.value)}
+                        />
                     </Label>
 
                     <Label

@@ -57,6 +57,10 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Custom Colors */
+    --color-apae-primary: #20c997;
+    --color-apae-variant: #ff7a30;
 }
 
 /*
@@ -153,7 +157,7 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-gray-600/15 text-foreground dark:!bg-background;
     }
 
     /* opcional, se precisar intervir diretamente */
