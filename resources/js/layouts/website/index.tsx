@@ -9,7 +9,7 @@ export function WebsiteLayout({ children, pageTitle }: LayoutProps) {
     return (
         <>
             <Header pageTitle={pageTitle} />
-            <main>{children}</main>
+            {children}
         </>
     );
 }
