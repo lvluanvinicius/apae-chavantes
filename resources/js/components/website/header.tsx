@@ -9,27 +9,27 @@ import { SearchBox } from './search-box';
 const MENU_DEFAULT_ITENS = [
     {
         id: 1,
-        href: route('home.index'),
+        href: route('website.home.index'),
         title: 'Início',
     },
     {
         id: 2,
-        href: route('home.index'),
+        href: route('website.home.index'),
         title: 'Transparência',
     },
     {
         id: 3,
-        href: route('home.index'),
+        href: route('website.photo-gallery.index'),
         title: 'Galeria de Fotos',
     },
     {
         id: 4,
-        href: route('home.index'),
+        href: route('website.home.index'),
         title: 'Ouvidoria',
     },
     {
         id: 5,
-        href: route('home.index'),
+        href: route('website.home.index'),
         title: 'Contato',
     },
 ];
