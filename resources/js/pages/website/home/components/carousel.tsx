@@ -30,7 +30,7 @@ export const Carousel = () => {
     }, [screen]);
 
     return (
-        <div className="h-[70vh]">
+        <section className="h-[70vh]">
             <Swiper
                 // Instala os módulos que vamos usar
                 modules={[Navigation, Pagination, Autoplay, EffectFade]}
@@ -60,6 +60,6 @@ export const Carousel = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-        </div>
+        </section>
     );
 };
