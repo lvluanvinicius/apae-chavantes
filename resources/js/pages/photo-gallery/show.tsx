@@ -13,10 +13,6 @@ interface PageProps {
 export default function Index({ data }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            href: '/dashboard',
-            title: 'Painel de Controle',
-        },
-        {
             href: '/photo-gallery',
             title: 'Galeria de Fotos',
         },
