@@ -1,4 +1,13 @@
 import FormButtonLoading from '@/components/form-button-loading';
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { TransparencyInterface, TypeFormMethod } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { EditIcon } from 'lucide-react';
+import { EditIcon, Trash2Icon } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 
 interface FolderCreateProps {
@@ -26,7 +35,16 @@ interface FolderCreateProps {
 export function FormFolder({ parentId, method, transparency }: FolderCreateProps) {
     const [open, setOpen] = useState(false);
 
-    const { data, setData, errors, post, put, reset, processing } = useForm({
+    const {
+        data,
+        setData,
+        errors,
+        post,
+        put,
+        reset,
+        processing,
+        delete: destroy,
+    } = useForm({
         name: transparency?.name ?? '',
         isFile: 'N',
     });
@@ -57,6 +75,19 @@ export function FormFolder({ parentId, method, transparency }: FolderCreateProps
                 },
             });
         }
+
+        if (method === 'DELETE' && transparency) {
+            const routeDestroy = parentId
+                ? route('admin.transparency.destroy', [transparency.uuid, parentId])
+                : route('admin.transparency.destroy', transparency.uuid);
+
+            destroy(routeDestroy, {
+                onSuccess() {
+                    reset();
+                    setOpen(false);
+                },
+            });
+        }
     }
 
     useEffect(() => {
@@ -64,6 +95,41 @@ export function FormFolder({ parentId, method, transparency }: FolderCreateProps
             setData('name', transparency.name);
         }
     }, [transparency, setData]);
+
+    if (method === 'DELETE' && transparency) {
+        return (
+            <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogTrigger asChild>
+                    <Button variant={'destructive'} size={'icon'}>
+                        <Trash2Icon />
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Deseja realmente prosseguir?</AlertDialogTitle>
+                        <AlertDialogDescription></AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <form onSubmit={handleSubmit}>
+                        <AlertDialogFooter>
+                            <Button type="button" className="cursor-pointer" variant={'outline'} onClick={() => setOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" className="cursor-pointer">
+                                <FormButtonLoading
+                                    processing={processing}
+                                    action={method}
+                                    messages={{
+                                        destroy: 'Confirmar',
+                                        deleting: 'Aguarde...',
+                                    }}
+                                />
+                            </Button>
+                        </AlertDialogFooter>
+                    </form>
+                </AlertDialogContent>
+            </AlertDialog>
+        );
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

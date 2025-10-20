@@ -59,10 +59,11 @@ Route::middleware('auth')->as('admin.')->group(function () {
     # Transparencia.
     Route::prefix('transparency')->as('transparency.')->group(function () {
         // Recupera arquivos e pastas em diretórios.
-        Route::get('{uuid?}', [TransparencyController::class, 'index'])->name('index');
+        Route::get('{parent?}', [TransparencyController::class, 'index'])->name('index');
 
         // Cria uma nova pasta ou envia um novo arquivo para o diretório em aberto.
-        Route::post('{uuid?}', [TransparencyController::class, 'store'])->name('store');
-        Route::put('{uuid?}', [TransparencyController::class, 'update'])->name('update');
+        Route::post('{parent?}', [TransparencyController::class, 'store'])->name('store');
+        Route::put('{uuid}/{parent?}', [TransparencyController::class, 'update'])->name('update');
+        Route::delete('{uuid}/{parent?}', [TransparencyController::class, 'destroy'])->name('destroy');
     });
 });

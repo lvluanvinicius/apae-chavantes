@@ -16,6 +16,14 @@ class TransparencyController extends Controller
     public function __construct(protected Transparency $transparency)
     {}
 
+    /**
+     * Efetua listagem de arquivos e pastas.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string|null $uuid
+     * @return InertiaResponse|\Inertia\ResponseFactory
+     */
     public function index(Request $request, string | null $uuid = null): InertiaResponse
     {
         $paginate = $request->has('paginate') ? $request->get('paginate') : 10;
@@ -68,7 +76,7 @@ class TransparencyController extends Controller
 
                 // Disco e diretório padronizados
                 $disk = config('files.transparency_disk', 'public');
-                $dir  = 'uploads/transparencies';
+                $dir  = 'transparency';
 
                 // 2. MUDANÇA: Arrays para armazenar dados para inserção em massa e rollback
                 $filesData   = [];
@@ -146,7 +154,7 @@ class TransparencyController extends Controller
 
         // Redireciona para a visão correta
         $route = $uuid ?
-        route('admin.transparency.index', ['uuid' => $uuid]) :
+        route('admin.transparency.index', ['parent' => $uuid]) :
         route('admin.transparency.index');
 
         return redirect($route)->with('success', $message);
@@ -180,7 +188,7 @@ class TransparencyController extends Controller
 
             if ($parent) {
                 $message = ($file->is_folder == 'Y' ? 'Pasta' : 'Arquivo') . " atualiz" . ($file->is_folder == 'Y' ? 'a' : 'o') . " com sucesso.";
-                return redirect()->route('admin.transparency.index', ['uuid' => $parent])->with('success', $message);
+                return redirect()->route('admin.transparency.index', ['parent' => $parent])->with('success', $message);
             }
 
             $message = ($file->is_folder == 'Y' ? 'Pasta' : 'Arquivo') . " atualiz" . ($file->is_folder == 'Y' ? 'a' : 'o') . " com sucesso.";
@@ -191,32 +199,57 @@ class TransparencyController extends Controller
         }
     }
 
+    /**
+     * Remove um registro e um arquivo se for o tipo arquivo.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     * @param string $uuid
+     * @param string|null $parent
+     * @throws \Exception
+     * @return RedirectResponse
+     */
     public function destroy(string $uuid, string | null $parent = null): RedirectResponse
     {
         try {
             if (! $file = $this->transparency->where('uuid', $uuid)->first()) {
-                throw new \Exception('Arquivo não encontrado.');
+                throw new \Exception('Registro não encontrado.');
             }
 
-            $data['path'] = $file->is_folder == 'N' ? $file->path : null;
-            $isFolder     = $file->is_folder;
+            // 2. Coletar os dados do arquivo ANTES de apagar o registro
+            $isFolder   = $file->is_folder;
+            $path       = $file->path;
+            $disk       = $file->disk; // Assumindo que você salva o disco, como no método store()
+            $entityName = ($isFolder == 'Y' ? 'Pasta' : 'Arquivo');
 
+            // 3. Apagar o registro do banco de dados
             if (! $file->delete()) {
-                throw new \Exception('Houve um erro ao tentar excluír o arquivo.');
+                throw new \Exception("Houve um erro ao tentar excluir o registro {$entityName}.");
             }
+
+            // 4. Se for um ARQUIVO (e não uma pasta) E o DB foi deletado, apagar o arquivo físico
+            if ($isFolder == 'N' && $path) {
+                // Verifica se o disco é válido antes de tentar apagar
+                if ($disk && Storage::disk($disk)->exists($path)) {
+                    Storage::disk($disk)->delete($path);
+                }
+            }
+
+            // 5. Lógica de redirecionamento (sem alterações)
+            $message = $entityName . " excluíd" . ($isFolder == 'Y' ? 'a' : 'o') . " com sucesso.";
 
             if ($parent) {
-                $message           = ($isFolder == 'Y' ? 'Pasta' : 'Arquivo') . " excluíd" . ($isFolder == 'Y' ? 'a' : 'o') . " com sucesso.";
-                $data['parent_id'] = $parent;
-                return redirect()->route('admin.transparency.index', ['uuid' => $parent])->with('success', $message);
+                return redirect()->route('admin.transparency.index', ['parent' => $parent])->with('success', $message);
             }
 
-            $message = ($isFolder == 'Y' ? 'Pasta' : 'Arquivo') . " excluíd" . ($isFolder == 'Y' ? 'a' : 'o') . " com sucesso.";
             return redirect()->route('admin.transparency.index')->with('success', $message);
+
         } catch (\Exception $error) {
             $errorMessage = $error->getMessage();
 
-            $error->getCode() == '23000' && $errorMessage = "Não é possível excluir o arquivo, pois ele está vinculado a outro registro.";
+            // 6. Tratamento de erro de FK (Constraint)
+            // O $error->getCode() pode ser string ou int dependendo do driver do banco
+            if (str_contains($error->getMessage(), '1451') || $error->getCode() == '23000') {
+                $errorMessage = "Não é possível excluir. O item está vinculado a outro registro.";
+            }
 
             return redirect()->back()->with('error', $errorMessage);
         }

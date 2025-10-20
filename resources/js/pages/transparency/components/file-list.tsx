@@ -110,7 +110,7 @@ const Row = ({ data, parentId }: { data: TransparencyInterface; parentId: string
 
                         <FormFolder transparency={data} method="PUT" parentId={parentId} />
 
-                        {/* <FileDelete file={data} parentId={parentId} /> */}
+                        <FormFolder transparency={data} method="DELETE" parentId={parentId} />
                     </div>
                 </div>
             </TableCell>
