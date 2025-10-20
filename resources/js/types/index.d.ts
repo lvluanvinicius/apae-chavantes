@@ -185,3 +185,23 @@ export interface SliderCampaignInterface {
     updated_at: string | null;
     sliders: number[] | null;
 }
+
+export interface TransparencyInterface {
+    id: number;
+    uuid: string;
+    parent_id: number | null;
+    is_folder: 'Y' | 'N';
+    uuid: string;
+    path: string;
+    name: string;
+    ext: string;
+    mime_type: string;
+    type: string;
+    size: number;
+    created_at: string | null;
+    updated_at: string | null;
+}
+
+export type TypeFormMethod = 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'PUTIMAGE';
+
+export type TransparencyTypeList = 'folder' | 'table';

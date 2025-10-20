@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PhotoGalleryFileUploadController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderCampaignController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\TransparencyController;
 use App\Http\Controllers\Admin\TrashDestroyController;
 use App\Http\Controllers\Admin\TrashGaleryFileController;
 use App\Http\Controllers\Admin\TrashPhotoGalleryController;
@@ -54,4 +55,14 @@ Route::middleware('auth')->as('admin.')->group(function () {
 
     # Configurações.
     Route::resource('settings', SettingController::class);
+
+    # Transparencia.
+    Route::prefix('transparency')->as('transparency.')->group(function () {
+        // Recupera arquivos e pastas em diretórios.
+        Route::get('{uuid?}', [TransparencyController::class, 'index'])->name('index');
+
+        // Cria uma nova pasta ou envia um novo arquivo para o diretório em aberto.
+        Route::post('{uuid?}', [TransparencyController::class, 'store'])->name('store');
+        Route::put('{uuid?}', [TransparencyController::class, 'update'])->name('update');
+    });
 });

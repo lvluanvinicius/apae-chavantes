@@ -24,7 +24,7 @@ export default function ApaeSidebar({ isOpen, toggleSidebar }: SidebarProps) {
         { href: '/dashboard', icon: Home, title: 'Painel', isActive: checkPath(url, 'dashboard') },
         { href: '/', icon: Globe, title: 'Website', isActive: checkPath(url, '') },
         { href: '/photo-gallery', icon: Camera, title: 'Galeria de Fotos', isActive: checkPath(url, 'photo-gallery') },
-        { href: '/', icon: Eye, title: 'Transparência', isActive: checkPath(url, '') },
+        { href: '/transparency', icon: Eye, title: 'Transparência', isActive: checkPath(url, '') },
         { href: '/', icon: Users, title: 'Parceiros', isActive: checkPath(url, '') },
         { href: '/', icon: Newspaper, title: 'Notícias', isActive: checkPath(url, '') },
         { href: '/sliders', icon: Image, title: 'Sliders', isActive: checkPath(url, '') },
