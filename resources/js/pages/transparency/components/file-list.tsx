@@ -24,27 +24,7 @@ export const FileListing = ({
                             <p className="text-[1rem] text-muted-foreground">Ainda não existe nenhum arquivo ou pasta.</p>
                         </div>
                     ) : (
-                        data.map((d) => {
-                            if (d.is_folder === 'Y') {
-                                return (
-                                    <Link
-                                        href={route('admin.transparency.index', [d.uuid])}
-                                        key={d.uuid}
-                                        className={cn('flex w-full flex-col items-center justify-center text-sm')}
-                                    >
-                                        <FolderIcon strokeWidth={0} fill={'orange'} className="h-32 w-32" />
-                                        {d.name}
-                                    </Link>
-                                );
-                            } else {
-                                return (
-                                    <div key={d.uuid} className={cn('flex w-full flex-col items-center justify-center text-sm')}>
-                                        <FileArchiveIcon className="h-32 w-32 text-blue-500" />
-                                        {d.name}
-                                    </div>
-                                );
-                            }
-                        })
+                        data.map((d) => <Folder key={d.uuid} data={d} parentId={parentId} />)
                     )}
                 </div>
             ) : (
@@ -115,5 +95,31 @@ const Row = ({ data, parentId }: { data: TransparencyInterface; parentId: string
                 </div>
             </TableCell>
         </TableRow>
+    );
+};
+
+const Folder = ({ data, parentId }: { data: TransparencyInterface; parentId: string | null }) => {
+    return (
+        <div className="relative rounded-2xl border border-muted-foreground/10 p-4">
+            {data.is_folder === 'Y' ? (
+                <Link
+                    href={route('admin.transparency.index', [data.uuid])}
+                    className={cn('flex w-full flex-col items-center justify-center text-sm')}
+                >
+                    <FolderIcon strokeWidth={0} fill={'orange'} className="h-32 w-32" />
+                    {data.name}
+                </Link>
+            ) : (
+                <div className={cn('flex w-full flex-col items-center justify-center text-sm')}>
+                    <FileArchiveIcon className="h-32 w-32 text-blue-500" />
+                    {data.name}
+                </div>
+            )}
+
+            <div className="mt-2 flex w-full items-center justify-center gap-2">
+                <FormFolder transparency={data} method="PUT" parentId={parentId} />
+                <FormFolder transparency={data} method="DELETE" parentId={parentId} />
+            </div>
+        </div>
     );
 };

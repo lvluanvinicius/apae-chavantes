@@ -100,7 +100,7 @@ export function FormFolder({ parentId, method, transparency }: FolderCreateProps
         return (
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogTrigger asChild>
-                    <Button variant={'destructive'} size={'icon'}>
+                    <Button variant={'destructive'} size={'icon'} className="size-8">
                         <Trash2Icon />
                     </Button>
                 </AlertDialogTrigger>
@@ -159,7 +159,7 @@ export function FormFolder({ parentId, method, transparency }: FolderCreateProps
                                 processing={processing}
                                 action={method}
                                 messages={{
-                                    create: 'Criar',
+                                    create: 'Enviar',
                                     creating: 'Aguarde...',
                                     update: 'Atualizar',
                                     updating: 'Aguarde...',
