@@ -14,7 +14,7 @@ const MENU_DEFAULT_ITENS = [
     },
     {
         id: 2,
-        href: route('website.home.index'),
+        href: route('website.transparencia.index'),
         title: 'Transparência',
     },
     {

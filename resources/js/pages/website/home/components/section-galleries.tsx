@@ -8,7 +8,7 @@ export const SectionGalleries = () => {
     const { galleries } = usePage<{ galleries: PhotoGalleryInterface[] }>().props;
 
     return (
-        <section className="flex h-full min-h-[80vh] w-full flex-col justify-center py-8">
+        <section className="flex h-full min-h-[80vh] w-full flex-col justify-center py-8 dark:bg-transparent">
             <div className="container mx-auto space-y-8 px-4 sm:px-0 md:space-y-16">
                 <div className="w-full">
                     <h2 className="text-xl font-bold md:text-2xl">Galeria de fotos</h2>
@@ -18,7 +18,10 @@ export const SectionGalleries = () => {
                 <ScrollArea className="relative w-full">
                     <div className="mb-8 flex items-center gap-8">
                         {galleries.map((gallery) => (
-                            <Card title={gallery.gallery_name} className="flex h-[29rem] w-[350px] flex-col justify-between pt-0 pr-0 pl-0">
+                            <Card
+                                title={gallery.gallery_name}
+                                className="flex h-[29rem] w-[350px] flex-col justify-between pt-0 pr-0 pl-0 shadow-md shadow-muted-foreground dark:shadow-none"
+                            >
                                 <CardContent className="flex h-64 w-full items-center justify-center p-0">
                                     <img
                                         alt={gallery.gallery_name}
