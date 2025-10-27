@@ -6,10 +6,8 @@ export const Breadcrumb = () => {
     const { breadcrumbs } = usePage<{ breadcrumbs?: TransparencyInterface[] }>().props;
     const parent = breadcrumbs ? (breadcrumbs.length >= 1 ? breadcrumbs[0] : null) : null;
 
-    console.log(parent);
-
     return (
-        <section className="container mx-auto mt-4 rounded-md bg-background px-4 py-4 shadow-md">
+        <section className="container mx-auto mt-4 rounded-md bg-white px-4 py-4 shadow-md dark:bg-background">
             <div className="w-full">
                 {parent ? (
                     <Link href={route('website.transparencia.index', [parent.uuid])} className="flex items-center gap-2">

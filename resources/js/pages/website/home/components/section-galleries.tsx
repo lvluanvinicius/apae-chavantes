@@ -8,7 +8,7 @@ export const SectionGalleries = () => {
     const { galleries } = usePage<{ galleries: PhotoGalleryInterface[] }>().props;
 
     return (
-        <section className="flex h-full min-h-[80vh] w-full flex-col justify-center py-8 dark:bg-transparent">
+        <section className="flex h-full min-h-[80vh] w-full flex-col justify-center bg-white py-8 dark:bg-transparent">
             <div className="container mx-auto space-y-8 px-4 sm:px-0 md:space-y-16">
                 <div className="w-full">
                     <h2 className="text-xl font-bold md:text-2xl">Galeria de fotos</h2>
